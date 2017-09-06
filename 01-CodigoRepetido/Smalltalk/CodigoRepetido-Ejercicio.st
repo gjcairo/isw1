@@ -13,29 +13,18 @@ TestCase subclass: #IdiomTest
 	poolDictionaries: ''
 	category: 'CodigoRepetido-Ejercicio'!
 
-!IdiomTest methodsFor: 'testing' stamp: 'GJC 9/5/2017 22:28:50'!
+!IdiomTest methodsFor: 'testing' stamp: 'GJC 9/5/2017 23:44:53'!
 checkRunningTimeOf: aBlock isLesserThan: aTimeMeasure
 
-	^ ( self measureRunningTimeOf: aBlock ) < aTimeMeasure ! !
+	^ ( Time millisecondsToRun: aBlock ) < aTimeMeasure ! !
 
-!IdiomTest methodsFor: 'testing' stamp: 'GJC 9/5/2017 22:47:29'!
-makeSureBlockErrors: aBlockThatShouldError satisfying: aBlockWithConditionsThatMustHold
+!IdiomTest methodsFor: 'testing' stamp: 'GJC 9/5/2017 23:50:44'!
+makeSureBlockErrors: aBlockThatShouldError signaling: error satisfying: aBlockWithConditionsThatMustHold
 
 	[ aBlockThatShouldError value.
 	self fail ]
-		on: Error 
+		on: error 
 		do: aBlockWithConditionsThatMustHold ! !
-
-!IdiomTest methodsFor: 'testing' stamp: 'GJC 9/5/2017 22:28:20'!
-measureRunningTimeOf: aBlock
-
-	| millisecondsBeforeRunning millisecondsAfterRunning |
-
-	millisecondsBeforeRunning _ Time millisecondClockValue.
-	aBlock value.
-	millisecondsAfterRunning _ Time millisecondClockValue.
-
-	^ millisecondsAfterRunning - millisecondsBeforeRunning.! !
 
 !IdiomTest methodsFor: 'testing' stamp: 'GJC 9/5/2017 22:29:52'!
 test01AddingCustomerShouldNotTakeMoreThan50Milliseconds
@@ -56,18 +45,18 @@ test02RemovingCustomerShouldNotTakeMoreThan100Milliseconds
 	
 	self assert: (self checkRunningTimeOf: [ customerBook removeCustomerNamed: paulMcCartney ] isLesserThan: 100 * millisecond).! !
 
-!IdiomTest methodsFor: 'testing' stamp: 'GJC 9/5/2017 22:44:19'!
+!IdiomTest methodsFor: 'testing' stamp: 'GJC 9/5/2017 23:50:56'!
 test03CanNotAddACustomerWithEmptyName 
 
 	| customerBook |
 			
 	customerBook := CustomerBook new.
 	
-	self makeSureBlockErrors: [ customerBook addCustomerNamed: ''. ] satisfying: [ :anError | 
-																								self assert: anError messageText = CustomerBook customerCanNotBeEmptyErrorMessage.
-																								self assert: customerBook isEmpty ]! !
+	self makeSureBlockErrors: [ customerBook addCustomerNamed: ''. ] signaling: Error satisfying: [ :anError | 
+																													self assert: anError messageText = CustomerBook customerCanNotBeEmptyErrorMessage.
+																													self assert: customerBook isEmpty ]! !
 
-!IdiomTest methodsFor: 'testing' stamp: 'GJC 9/5/2017 22:45:49'!
+!IdiomTest methodsFor: 'testing' stamp: 'GJC 9/5/2017 23:51:07'!
 test04CanNotRemoveAnInvalidCustomer
 	
 	| customerBook johnLennon |
@@ -77,9 +66,9 @@ test04CanNotRemoveAnInvalidCustomer
 	customerBook addCustomerNamed: johnLennon.
 	
 	
-	self makeSureBlockErrors: [ customerBook removeCustomerNamed: 'Paul McCartney' ] satisfying: [ :anError |
-																														self assert: customerBook numberOfCustomers = 1.
-																														self assert: (customerBook includesCustomerNamed: johnLennon) ].! !
+	self makeSureBlockErrors: [ customerBook removeCustomerNamed: 'Paul McCartney' ] signaling: NotFound satisfying: [ :anError |
+																																				self assert: customerBook numberOfCustomers = 1.
+																																				self assert: (customerBook includesCustomerNamed: johnLennon) ].! !
 
 
 !classDefinition: #CustomerBook category: #'CodigoRepetido-Ejercicio'!
