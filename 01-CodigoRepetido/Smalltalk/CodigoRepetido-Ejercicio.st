@@ -13,16 +13,40 @@ TestCase subclass: #IdiomTest
 	poolDictionaries: ''
 	category: 'CodigoRepetido-Ejercicio'!
 
-!IdiomTest methodsFor: 'testing' stamp: 'GJC 9/3/2017 00:42:25'!
+!IdiomTest methodsFor: 'testing' stamp: 'GJC 9/5/2017 22:28:50'!
+checkRunningTimeOf: aBlock isLesserThan: aTimeMeasure
+
+	^ ( self measureRunningTimeOf: aBlock ) < aTimeMeasure ! !
+
+!IdiomTest methodsFor: 'testing' stamp: 'GJC 9/5/2017 22:47:29'!
+makeSureBlockErrors: aBlockThatShouldError satisfying: aBlockWithConditionsThatMustHold
+
+	[ aBlockThatShouldError value.
+	self fail ]
+		on: Error 
+		do: aBlockWithConditionsThatMustHold ! !
+
+!IdiomTest methodsFor: 'testing' stamp: 'GJC 9/5/2017 22:28:20'!
+measureRunningTimeOf: aBlock
+
+	| millisecondsBeforeRunning millisecondsAfterRunning |
+
+	millisecondsBeforeRunning _ Time millisecondClockValue.
+	aBlock value.
+	millisecondsAfterRunning _ Time millisecondClockValue.
+
+	^ millisecondsAfterRunning - millisecondsBeforeRunning.! !
+
+!IdiomTest methodsFor: 'testing' stamp: 'GJC 9/5/2017 22:29:52'!
 test01AddingCustomerShouldNotTakeMoreThan50Milliseconds
 
 	| customerBook |
 	
 	customerBook _ CustomerBook new.
 	
-	self assert: (Stopwatch new checkRunningTimeOf: [ customerBook addCustomerNamed: 'John Lennon' ] isLesserThan: 50*millisecond ).! !
+	self assert: (self checkRunningTimeOf: [ customerBook addCustomerNamed: 'John Lennon' ] isLesserThan: 50*millisecond ).! !
 
-!IdiomTest methodsFor: 'testing' stamp: 'GJC 9/3/2017 00:46:37'!
+!IdiomTest methodsFor: 'testing' stamp: 'GJC 9/5/2017 22:30:02'!
 test02RemovingCustomerShouldNotTakeMoreThan100Milliseconds
 	| customerBook paulMcCartney |
 
@@ -30,23 +54,20 @@ test02RemovingCustomerShouldNotTakeMoreThan100Milliseconds
 	paulMcCartney _ 'Paul McCartney'.
 	customerBook addCustomerNamed: paulMcCartney.
 	
-	self assert: (Stopwatch new checkRunningTimeOf: [ customerBook removeCustomerNamed: paulMcCartney ] isLesserThan: 100 * millisecond).! !
+	self assert: (self checkRunningTimeOf: [ customerBook removeCustomerNamed: paulMcCartney ] isLesserThan: 100 * millisecond).! !
 
-!IdiomTest methodsFor: 'testing' stamp: 'HernanWilkinson 5/9/2012 18:12'!
+!IdiomTest methodsFor: 'testing' stamp: 'GJC 9/5/2017 22:44:19'!
 test03CanNotAddACustomerWithEmptyName 
 
 	| customerBook |
 			
 	customerBook := CustomerBook new.
+	
+	self makeSureBlockErrors: [ customerBook addCustomerNamed: ''. ] satisfying: [ :anError | 
+																								self assert: anError messageText = CustomerBook customerCanNotBeEmptyErrorMessage.
+																								self assert: customerBook isEmpty ]! !
 
-	[ customerBook addCustomerNamed: ''.
-	self fail ]
-		on: Error 
-		do: [ :anError | 
-			self assert: anError messageText = CustomerBook customerCanNotBeEmptyErrorMessage.
-			self assert: customerBook isEmpty ]! !
-
-!IdiomTest methodsFor: 'testing' stamp: 'HAW 8/28/2017 08:57:25'!
+!IdiomTest methodsFor: 'testing' stamp: 'GJC 9/5/2017 22:45:49'!
 test04CanNotRemoveAnInvalidCustomer
 	
 	| customerBook johnLennon |
@@ -55,13 +76,10 @@ test04CanNotRemoveAnInvalidCustomer
 	johnLennon := 'John Lennon'.
 	customerBook addCustomerNamed: johnLennon.
 	
-	[ customerBook removeCustomerNamed: 'Paul McCartney'.
-	self fail ]
-		on: NotFound 
-		do: [ :anError | 
-			self assert: customerBook numberOfCustomers = 1.
-			self assert: (customerBook includesCustomerNamed: johnLennon) ]
-! !
+	
+	self makeSureBlockErrors: [ customerBook removeCustomerNamed: 'Paul McCartney' ] satisfying: [ :anError |
+																														self assert: customerBook numberOfCustomers = 1.
+																														self assert: (customerBook includesCustomerNamed: johnLennon) ].! !
 
 
 !classDefinition: #CustomerBook category: #'CodigoRepetido-Ejercicio'!
@@ -89,7 +107,7 @@ initialize
 	customers := OrderedCollection new! !
 
 
-!CustomerBook methodsFor: 'customer management' stamp: 'HernanWilkinson 7/6/2011 17:42'!
+!CustomerBook methodsFor: 'customer management' stamp: 'GJC 9/5/2017 22:43:36'!
 addCustomerNamed: aName
 
 	aName isEmpty ifTrue: [ self signalCustomerNameCannotBeEmpty ].
@@ -132,24 +150,3 @@ customerAlreadyExistsErrorMessage
 customerCanNotBeEmptyErrorMessage
 
 	^'Customer name cannot be empty'! !
-
-
-!classDefinition: #Stopwatch category: #'CodigoRepetido-Ejercicio'!
-Object subclass: #Stopwatch
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'CodigoRepetido-Ejercicio'!
-
-!Stopwatch methodsFor: 'as yet unclassified' stamp: 'GJC 9/3/2017 00:40:00'!
-checkRunningTimeOf: aBlock isLesserThan: aTimeMeasure
-
-	^ ( self measureRunningTimeOf: aBlock ) < aTimeMeasure ! !
-
-!Stopwatch methodsFor: 'as yet unclassified' stamp: 'GJC 9/3/2017 00:36:56'!
-measureRunningTimeOf: aBlock
-	| millisecondsBeforeRunning millisecondsAfterRunning |
-	millisecondsBeforeRunning _ Time millisecondClockValue.
-	aBlock value.
-	millisecondsAfterRunning _ Time millisecondClockValue.
-	^ millisecondsAfterRunning - millisecondsBeforeRunning.! !
