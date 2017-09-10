@@ -241,7 +241,7 @@ invalidNumberTypeErrorDescription
 
 !classDefinition: #Entero category: #'Numero-Exercise'!
 Numero subclass: #Entero
-	instanceVariableNames: 'value'
+	instanceVariableNames: 'value anEntero aFraccion'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Numero-Exercise'!
@@ -282,27 +282,18 @@ initalizeWith: aValue
 	value := aValue! !
 
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'GJC 9/7/2017 21:56:23'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'sumarEntero 9/9/2017 22:48:44'!
 * aMultiplier
-	
-	(aMultiplier isKindOf: Entero) ifTrue: [
-		^self class with: value * aMultiplier integerValue].
-	
-	(aMultiplier isKindOf: Fraccion) ifTrue: [
-		^(self * aMultiplier numerator) / aMultiplier denominator ].! !
+	^ aMultiplier multiplyEntero: self! !
 
 !Entero methodsFor: 'arithmetic operations' stamp: 'GJC 9/9/2017 21:07:36'!
 + anAdder
 	^ anAdder addEntero: self.! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'GJC 9/7/2017 21:45:08'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'sumarEntero 9/9/2017 22:33:24'!
 / aDivisor 
 	
-	(aDivisor isKindOf: Entero) ifTrue: [
-		^Fraccion with: self over: aDivisor].
-	
-	(aDivisor isKindOf: Fraccion) ifTrue: [
-		^Fraccion with: self * aDivisor denominator over: aDivisor numerator].! !
+	^ aDivisor divideByEntero: self! !
 
 !Entero methodsFor: 'arithmetic operations' stamp: 'HernanWilkinson 5/7/2016 21:55'!
 // aDivisor 
@@ -324,10 +315,30 @@ addFraccion: aFraccion
 	
 	^ newNumerator / newDenominator.! !
 
+!Entero methodsFor: 'arithmetic operations' stamp: 'sumarEntero 9/9/2017 22:31:25'!
+divideByEntero anEntero
+
+	^Fraccion with: self over: anEntero! !
+
+!Entero methodsFor: 'arithmetic operations' stamp: 'sumarEntero 9/9/2017 22:32:40'!
+divideByFraccion aFraccion
+
+	^Fraccion with: self * aFraccion denominator over: aFraccion numerator! !
+
 !Entero methodsFor: 'arithmetic operations' stamp: 'HernanWilkinson 5/7/2016 21:00'!
 greatestCommonDivisorWith: anEntero 
 	
 	^self class with: (value gcd: anEntero integerValue)! !
+
+!Entero methodsFor: 'arithmetic operations' stamp: 'sumarEntero 9/9/2017 22:25:50'!
+multiplyEntero anEntero
+
+	^self class with: value * anEntero integerValue! !
+
+!Entero methodsFor: 'arithmetic operations' stamp: 'sumarEntero 9/9/2017 22:21:03'!
+multiplyFraccion aFraccion
+
+	^(self * aFraccion numerator) / aFraccion denominator! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -346,7 +357,7 @@ with: aValue
 
 !classDefinition: #Fraccion category: #'Numero-Exercise'!
 Numero subclass: #Fraccion
-	instanceVariableNames: 'numerator denominator'
+	instanceVariableNames: 'numerator denominator anEntero aFraccion'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Numero-Exercise'!
@@ -384,29 +395,20 @@ hash
 	^(numerator hash / denominator hash) hash! !
 
 
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'GJC 9/7/2017 21:41:05'!
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'sumarEntero 9/9/2017 22:41:54'!
 * aMultiplier 
 	
-	(aMultiplier isKindOf: Entero) ifTrue: [
-		^(numerator * aMultiplier) / denominator ].
-	
-	(aMultiplier isKindOf: Fraccion) ifTrue: [
-		^(numerator * aMultiplier numerator) / (denominator * aMultiplier denominator) ].
-	! !
+	^ aMultiplier multiplyByFraccion: self! !
 
 !Fraccion methodsFor: 'arithmetic operations' stamp: 'GJC 9/9/2017 21:08:39'!
 + anAdder
 
 	^ anAdder addFraccion: self.! !
 
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'GJC 9/7/2017 21:51:44'!
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'sumarEntero 9/9/2017 22:41:12'!
 / aDivisor 
 	
-	(aDivisor isKindOf: Entero) ifTrue: [
-		^Fraccion with: numerator over: denominator * aDivisor].
-	
-	(aDivisor isKindOf: Fraccion) ifTrue: [
-		^(numerator * aDivisor denominator) / (denominator * aDivisor numerator) ].! !
+	^ aDivisor divideByFraccion: self! !
 
 !Fraccion methodsFor: 'arithmetic operations' stamp: 'GJC 9/9/2017 22:09:22'!
 addFraccion: aFraccion
@@ -417,6 +419,16 @@ addFraccion: aFraccion
 	newDenominator _ denominator * aFraccion denominator.
 	
 	^ newNumerator / newDenominator.! !
+
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'sumarEntero 9/9/2017 22:39:37'!
+divideByEntero anEntero
+
+	^Fraccion with: numerator over: denominator * anEntero! !
+
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'sumarEntero 9/9/2017 22:40:08'!
+divideByFraccion aFraccion
+	
+	^(numerator * aFraccion denominator) / (denominator * aFraccion numerator)! !
 
 
 !Fraccion methodsFor: 'accessing' stamp: 'GJC 9/9/2017 21:08:09'!
@@ -433,6 +445,17 @@ denominator
 numerator
 
 	^ numerator! !
+
+
+!Fraccion methodsFor: 'as yet unclassified' stamp: 'sumarEntero 9/9/2017 22:35:34'!
+multiplyByEntero anEntero
+
+	^(numerator * anEntero) / denominator ! !
+
+!Fraccion methodsFor: 'as yet unclassified' stamp: 'sumarEntero 9/9/2017 22:36:07'!
+multiplyByFraccion aFraccion
+
+	^(numerator * aFraccion numerator) / (denominator * aFraccion denominator)! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 

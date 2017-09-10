@@ -1,0 +1,65 @@
+Entero
+
+
+multiplyEntero anEntero
+
+	^self class with: value * anEntero integerValue
+
+
+multiplyFraccion aFraccion
+
+	^(self * aFraccion numerator) / aFraccion denominator
+
+
+* aMultiplier
+  ^ aMultiplier multiplyEntero: self
+
+
+
+divideByEntero anEntero
+
+	^Fraccion with: self over: anEntero
+
+
+divideByFraccion aFraccion
+
+^Fraccion with: self * aFraccion denominator over: aFraccion numerator
+
+
+/ aDivisor
+
+	^ aDivisor divideByEntero: self
+
+
+
+Fraccion
+
+
+multiplyByEntero anEntero
+
+	^(numerator * anEntero) / denominator
+
+
+multiplyByFraccion aFraccion
+
+	^(numerator * aFraccion numerator) / (denominator * aFraccion denominator)
+
+
+* aMultiplier
+
+	^ aMultiplier multiplyByFraccion: self
+
+
+divideByEntero anEntero
+
+	^Fraccion with: numerator over: denominator * anEntero
+
+
+divideByFraccion aFraccion
+
+	^(numerator * aFraccion denominator) / (denominator * aFraccion numerator)
+
+
+/ aDivisor
+
+	^ aDivisor divideByFraccion: self
