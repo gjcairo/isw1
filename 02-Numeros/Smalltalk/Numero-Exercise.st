@@ -425,10 +425,10 @@ addFraccion: aFraccion
 	
 	^ newNumerator / newDenominator.! !
 
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'sumarEntero 9/10/2017 00:56:40'!
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'GJC 9/10/2017 11:02:49'!
 dividesAFraccion: aFraccion
 	
-	^(denominator * aFraccion numerator) / (numerator * aFraccion denominator)! !
+	^(aFraccion numerator * denominator) / (aFraccion denominator * numerator)! !
 
 !Fraccion methodsFor: 'arithmetic operations' stamp: 'sumarEntero 9/10/2017 00:55:31'!
 dividesAnEntero: anEntero
