@@ -291,12 +291,9 @@ initalizeWith: aValue
 	(aMultiplier isKindOf: Fraccion) ifTrue: [
 		^(self * aMultiplier numerator) / aMultiplier denominator ].! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'GJC 9/9/2017 20:36:20'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'GJC 9/9/2017 21:07:36'!
 + anAdder
-	
-	(anAdder isKindOf: Entero) ifTrue: [ ^self class with: value + anAdder integerValue ].
-	(anAdder isKindOf: Fraccion) ifTrue: [ ^ (Entero with: ((value * anAdder denominator integerValue) + anAdder numerator integerValue)) / anAdder denominator ].
-! !
+	^ anAdder addEntero: self.! !
 
 !Entero methodsFor: 'arithmetic operations' stamp: 'GJC 9/7/2017 21:45:08'!
 / aDivisor 
@@ -311,6 +308,21 @@ initalizeWith: aValue
 // aDivisor 
 	
 	^self class with: value // aDivisor integerValue! !
+
+!Entero methodsFor: 'arithmetic operations' stamp: 'GJC 9/9/2017 21:07:55'!
+addEntero: anEntero
+
+	^ self class with: value + anEntero integerValue.! !
+
+!Entero methodsFor: 'arithmetic operations' stamp: 'GJC 9/9/2017 21:08:34'!
+addFraccion: aFraccion
+
+	| newNumerator newDenominator |
+	
+	newNumerator _ aFraccion numerator + (aFraccion denominator * self).
+	newDenominator _ aFraccion denominator.
+	
+	^ newNumerator / newDenominator.! !
 
 !Entero methodsFor: 'arithmetic operations' stamp: 'HernanWilkinson 5/7/2016 21:00'!
 greatestCommonDivisorWith: anEntero 
@@ -382,20 +394,10 @@ hash
 		^(numerator * aMultiplier numerator) / (denominator * aMultiplier denominator) ].
 	! !
 
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'GJC 9/7/2017 21:34:01'!
-+ anAdder 
-	
-	| newNumerator newDenominator |
-	
-	(anAdder isKindOf: Entero) ifTrue: [
-		newNumerator := numerator + (denominator * anAdder).
-		newDenominator := denominator ].
-	
-	(anAdder isKindOf: Fraccion) ifTrue: [
-		newNumerator := (numerator * anAdder denominator) + (denominator * anAdder numerator).
-		newDenominator := denominator * anAdder denominator ].
-	
-	^newNumerator / newDenominator! !
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'GJC 9/9/2017 21:08:39'!
++ anAdder
+
+	^ anAdder addFraccion: self.! !
 
 !Fraccion methodsFor: 'arithmetic operations' stamp: 'GJC 9/7/2017 21:51:44'!
 / aDivisor 
@@ -406,6 +408,21 @@ hash
 	(aDivisor isKindOf: Fraccion) ifTrue: [
 		^(numerator * aDivisor denominator) / (denominator * aDivisor numerator) ].! !
 
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'GJC 9/9/2017 21:08:46'!
+addFraccion: aFraccion
+
+	| newNumerator newDenominator |
+	
+	newNumerator _ numerator * self denominator + (denominator * self numerator).
+	newDenominator _ denominator * self denominator.
+	
+	^ newNumerator / newDenominator.! !
+
+
+!Fraccion methodsFor: 'accessing' stamp: 'GJC 9/9/2017 21:08:09'!
+addEntero: anEntero
+
+	^ (Entero with: anEntero integerValue * self denominator integerValue + self numerator integerValue) / self denominator.! !
 
 !Fraccion methodsFor: 'accessing' stamp: 'HernanWilkinson 5/7/2016 21:56'!
 denominator
@@ -416,7 +433,6 @@ denominator
 numerator
 
 	^ numerator! !
-
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
