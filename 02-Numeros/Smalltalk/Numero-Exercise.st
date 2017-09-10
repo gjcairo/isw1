@@ -315,13 +315,13 @@ addFraccion: aFraccion
 	
 	^ newNumerator / newDenominator.! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'sumarEntero 9/9/2017 22:31:25'!
-divideByEntero anEntero
+!Entero methodsFor: 'arithmetic operations' stamp: 'GJC 9/9/2017 23:03:22'!
+divideByEntero: anEntero
 
 	^Fraccion with: self over: anEntero! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'sumarEntero 9/9/2017 22:32:40'!
-divideByFraccion aFraccion
+!Entero methodsFor: 'arithmetic operations' stamp: 'GJC 9/9/2017 23:03:28'!
+divideByFraccion: aFraccion
 
 	^Fraccion with: self * aFraccion denominator over: aFraccion numerator! !
 
@@ -330,13 +330,13 @@ greatestCommonDivisorWith: anEntero
 	
 	^self class with: (value gcd: anEntero integerValue)! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'sumarEntero 9/9/2017 22:25:50'!
-multiplyEntero anEntero
+!Entero methodsFor: 'arithmetic operations' stamp: 'GJC 9/9/2017 23:03:54'!
+multiplyByEntero: anEntero
 
 	^self class with: value * anEntero integerValue! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'sumarEntero 9/9/2017 22:21:03'!
-multiplyFraccion aFraccion
+!Entero methodsFor: 'arithmetic operations' stamp: 'GJC 9/9/2017 23:04:01'!
+multiplyByFraccion: aFraccion
 
 	^(self * aFraccion numerator) / aFraccion denominator! !
 
@@ -410,6 +410,11 @@ hash
 	
 	^ aDivisor divideByFraccion: self! !
 
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'GJC 9/9/2017 21:08:09'!
+addEntero: anEntero
+
+	^ (Entero with: anEntero integerValue * self denominator integerValue + self numerator integerValue) / self denominator.! !
+
 !Fraccion methodsFor: 'arithmetic operations' stamp: 'GJC 9/9/2017 22:09:22'!
 addFraccion: aFraccion
 
@@ -420,21 +425,26 @@ addFraccion: aFraccion
 	
 	^ newNumerator / newDenominator.! !
 
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'sumarEntero 9/9/2017 22:39:37'!
-divideByEntero anEntero
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'GJC 9/9/2017 23:04:15'!
+divideByEntero: anEntero
 
 	^Fraccion with: numerator over: denominator * anEntero! !
 
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'sumarEntero 9/9/2017 22:40:08'!
-divideByFraccion aFraccion
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'GJC 9/9/2017 23:04:28'!
+divideByFraccion: aFraccion
 	
 	^(numerator * aFraccion denominator) / (denominator * aFraccion numerator)! !
 
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'GJC 9/9/2017 23:04:58'!
+multiplyByEntero: anEntero
 
-!Fraccion methodsFor: 'accessing' stamp: 'GJC 9/9/2017 21:08:09'!
-addEntero: anEntero
+	^(numerator * anEntero) / denominator ! !
 
-	^ (Entero with: anEntero integerValue * self denominator integerValue + self numerator integerValue) / self denominator.! !
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'GJC 9/9/2017 23:05:03'!
+multiplyByFraccion: aFraccion
+
+	^(numerator * aFraccion numerator) / (denominator * aFraccion denominator)! !
+
 
 !Fraccion methodsFor: 'accessing' stamp: 'HernanWilkinson 5/7/2016 21:56'!
 denominator
@@ -445,17 +455,6 @@ denominator
 numerator
 
 	^ numerator! !
-
-
-!Fraccion methodsFor: 'as yet unclassified' stamp: 'sumarEntero 9/9/2017 22:35:34'!
-multiplyByEntero anEntero
-
-	^(numerator * anEntero) / denominator ! !
-
-!Fraccion methodsFor: 'as yet unclassified' stamp: 'sumarEntero 9/9/2017 22:36:07'!
-multiplyByFraccion aFraccion
-
-	^(numerator * aFraccion numerator) / (denominator * aFraccion denominator)! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
