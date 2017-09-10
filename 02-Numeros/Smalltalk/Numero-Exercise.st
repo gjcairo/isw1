@@ -408,13 +408,13 @@ hash
 	(aDivisor isKindOf: Fraccion) ifTrue: [
 		^(numerator * aDivisor denominator) / (denominator * aDivisor numerator) ].! !
 
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'GJC 9/9/2017 21:08:46'!
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'GJC 9/9/2017 22:09:22'!
 addFraccion: aFraccion
 
 	| newNumerator newDenominator |
 	
-	newNumerator _ numerator * self denominator + (denominator * self numerator).
-	newDenominator _ denominator * self denominator.
+	newNumerator _ (numerator * aFraccion denominator) + (aFraccion numerator * denominator).
+	newDenominator _ denominator * aFraccion denominator.
 	
 	^ newNumerator / newDenominator.! !
 
