@@ -282,9 +282,9 @@ initalizeWith: aValue
 	value := aValue! !
 
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'sumarEntero 9/9/2017 22:48:44'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'sumarEntero 9/9/2017 23:18:52'!
 * aMultiplier
-	^ aMultiplier multiplyEntero: self! !
+	^ aMultiplier multiplyByEntero: self! !
 
 !Entero methodsFor: 'arithmetic operations' stamp: 'GJC 9/9/2017 21:07:36'!
 + anAdder
