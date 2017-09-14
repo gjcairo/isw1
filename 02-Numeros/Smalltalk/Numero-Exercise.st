@@ -296,15 +296,15 @@ initalizeWith: aValue
 	
 	^ aDivisor dividesAnEntero: self! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'HernanWilkinson 5/7/2016 21:55'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'GJC 9/14/2017 11:45:32'!
 // aDivisor 
 	
-	^self class with: value // aDivisor integerValue! !
+	^Entero with: value // aDivisor integerValue! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'GJC 9/14/2017 11:22:55'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'GJC 9/14/2017 11:45:40'!
 addEntero: anEntero
 
-	^ self class with: value + anEntero integerValue.! !
+	^ Entero with: value + anEntero integerValue.! !
 
 !Entero methodsFor: 'arithmetic operations' stamp: 'GJC 9/9/2017 21:08:34'!
 addFraccion: aFraccion
@@ -316,10 +316,11 @@ addFraccion: aFraccion
 	
 	^ newNumerator / newDenominator.! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'GJC 9/14/2017 11:11:47'!
-asDenominatorOfNumerator: aNumerator shouldSucceed: aBlock
-	
-	^aBlock value: aNumerator value: self.! !
+!Entero methodsFor: 'arithmetic operations' stamp: 'GJC 9/14/2017 11:48:57'!
+asDenominatorOfNumerator: aNumerator success: aBlock
+	^ aBlock
+		value: aNumerator
+		value: self.! !
 
 !Entero methodsFor: 'arithmetic operations' stamp: 'sumarEntero 9/10/2017 00:57:28'!
 dividesAFraccion: aFraccion
@@ -331,31 +332,30 @@ dividesAnEntero: anEntero
 
 	^Fraccion with: anEntero over: self! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'HernanWilkinson 5/7/2016 21:00'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'GJC 9/14/2017 11:45:55'!
 greatestCommonDivisorWith: anEntero 
 	
-	^self class with: (value gcd: anEntero integerValue)! !
+	^Entero with: (value gcd: anEntero integerValue)! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'GJC 9/9/2017 23:03:54'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'GJC 9/14/2017 11:46:00'!
 multiplyByEntero: anEntero
 
-	^self class with: value * anEntero integerValue! !
+	^Entero with: value * anEntero integerValue! !
 
 !Entero methodsFor: 'arithmetic operations' stamp: 'GJC 9/9/2017 23:04:01'!
 multiplyByFraccion: aFraccion
 
 	^(self * aFraccion numerator) / aFraccion denominator! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'GJC 9/14/2017 11:09:00'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'GJC 9/14/2017 11:48:57'!
 shouldBeValidDenominatorOfNumerator: aNumerator success: aBlock
-	
 	| greatestCommonDivisor numerator denominator |
-	
-	greatestCommonDivisor := aNumerator greatestCommonDivisorWith: self. 
-	numerator := aNumerator // greatestCommonDivisor.
-	denominator := self // greatestCommonDivisor.
-	
-	^ denominator asDenominatorOfNumerator: numerator shouldSucceed: aBlock.! !
+	greatestCommonDivisor _ aNumerator greatestCommonDivisorWith: self.
+	numerator _ aNumerator // greatestCommonDivisor.
+	denominator _ self // greatestCommonDivisor.
+	^ denominator
+		asDenominatorOfNumerator: numerator
+		success: aBlock.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -381,15 +381,9 @@ Entero subclass: #One
 	poolDictionaries: ''
 	category: 'Numero-Exercise'!
 
-!One methodsFor: 'as yet unclassified' stamp: 'GJC 9/14/2017 11:26:08'!
-addEntero: anEntero
-
-	^Entero with: value + anEntero integerValue! !
-
-!One methodsFor: 'as yet unclassified' stamp: 'GJC 9/14/2017 10:37:26'!
-asDenominatorOfNumerator: aNumerator shouldSucceed: aBlock
-
-	^aNumerator! !
+!One methodsFor: 'as yet unclassified' stamp: 'GJC 9/14/2017 11:48:57'!
+asDenominatorOfNumerator: aNumerator success: aBlock
+	^ aNumerator.! !
 
 !One methodsFor: 'as yet unclassified' stamp: 'GJC 9/14/2017 09:59:37'!
 initialize
@@ -403,11 +397,6 @@ Entero subclass: #Zero
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Numero-Exercise'!
-
-!Zero methodsFor: 'as yet unclassified' stamp: 'GJC 9/14/2017 10:39:44'!
-asDenominatorOfNumerator: aNumerator shouldSucceed: aBlock
-
-	^Fraccion error: Fraccion canNotDivideByZeroErrorDescription! !
 
 !Zero methodsFor: 'as yet unclassified' stamp: 'GJC 9/14/2017 09:59:46'!
 initialize
@@ -527,22 +516,7 @@ numerator
 Fraccion class
 	instanceVariableNames: ''!
 
-!Fraccion class methodsFor: 'intance creation' stamp: 'GJC 9/14/2017 11:17:47'!
+!Fraccion class methodsFor: 'intance creation' stamp: 'GJC 9/14/2017 11:49:40'!
 with: aDividend over: aDivisor
 
-	"| greatestCommonDivisor numerator denominator |"
-	
-	^ aDivisor shouldBeValidDenominatorOfNumerator: aDividend success: [ :numerator :denominator | self new initializeWith: numerator over: denominator ].
-	"aDivisor asDenominatorOfNumerator: aDividend shouldSucceed: [ :numerator :denominator | ^self new initializeWith: numerator over: denominator ]."
-	
-	"aDivisor isZero ifTrue: [ self error: self canNotDivideByZeroErrorDescription ].
-	aDividend isZero ifTrue: [ ^aDividend ].
-	
-	greatestCommonDivisor := aDividend greatestCommonDivisorWith: aDivisor. 
-	numerator := aDividend // greatestCommonDivisor.
-	denominator := aDivisor // greatestCommonDivisor.
-	
-	denominator isOne ifTrue: [ ^numerator ].
-
-	^self new initializeWith: numerator over: denominator"
-	! !
+	^ aDivisor shouldBeValidDenominatorOfNumerator: aDividend success: [ :numerator :denominator | self new initializeWith: numerator over: denominator ].! !
