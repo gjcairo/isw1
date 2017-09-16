@@ -139,10 +139,44 @@ test10CanNotTopWhenThereAreNoObjectsInTheStack
 
 !classDefinition: #OOStack category: #'Stack-Exercise'!
 Object subclass: #OOStack
-	instanceVariableNames: ''
+	instanceVariableNames: 'top'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
+
+!OOStack methodsFor: 'as yet unclassified' stamp: 'GJC 9/16/2017 18:38:55'!
+initialize
+
+	top _ OOStackBase new.! !
+
+!OOStack methodsFor: 'as yet unclassified' stamp: 'GJC 9/15/2017 01:58:42'!
+isEmpty
+
+	^top isEmpty! !
+
+!OOStack methodsFor: 'as yet unclassified' stamp: 'GJC 9/16/2017 18:27:11'!
+pop
+	
+	| poppedElement |
+	
+	poppedElement := self top.
+	top := top previousElement.
+	^poppedElement ! !
+
+!OOStack methodsFor: 'as yet unclassified' stamp: 'GJC 9/16/2017 18:28:00'!
+push: anObject
+
+	top _ OOStackElement new initializeWith: anObject onTopOf: top.! !
+
+!OOStack methodsFor: 'as yet unclassified' stamp: 'GJC 9/16/2017 18:43:40'!
+size
+
+	^top position! !
+
+!OOStack methodsFor: 'as yet unclassified' stamp: 'GJC 9/16/2017 18:28:25'!
+top
+	
+	^top value! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -154,3 +188,66 @@ OOStack class
 stackEmptyErrorDescription
 	
 	^ 'Stack is empty'! !
+
+
+!classDefinition: #OOStackBase category: #'Stack-Exercise'!
+Object subclass: #OOStackBase
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+!OOStackBase methodsFor: 'as yet unclassified' stamp: 'GJC 9/15/2017 02:05:19'!
+isEmpty
+
+	^true! !
+
+!OOStackBase methodsFor: 'as yet unclassified' stamp: 'GJC 9/16/2017 18:43:26'!
+position
+
+	^0! !
+
+!OOStackBase methodsFor: 'as yet unclassified' stamp: 'GJC 9/16/2017 18:24:48'!
+previousElement
+
+	self error: OOStack stackEmptyErrorDescription ! !
+
+!OOStackBase methodsFor: 'as yet unclassified' stamp: 'GJC 9/16/2017 18:28:48'!
+value
+
+	self error: OOStack stackEmptyErrorDescription ! !
+
+
+!classDefinition: #OOStackElement category: #'Stack-Exercise'!
+Object subclass: #OOStackElement
+	instanceVariableNames: 'elementValue previousElement position'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+!OOStackElement methodsFor: 'as yet unclassified' stamp: 'GJC 9/16/2017 18:47:12'!
+initializeWith: anObject onTopOf: anOOStackElement 
+	
+	elementValue := anObject.
+	previousElement := anOOStackElement.
+	position := previousElement position + 1! !
+
+!OOStackElement methodsFor: 'as yet unclassified' stamp: 'GJC 9/15/2017 02:05:13'!
+isEmpty
+
+	^false! !
+
+!OOStackElement methodsFor: 'as yet unclassified' stamp: 'GJC 9/16/2017 18:43:13'!
+position
+
+	^position! !
+
+!OOStackElement methodsFor: 'as yet unclassified' stamp: 'GJC 9/16/2017 18:20:05'!
+previousElement
+
+	^previousElement ! !
+
+!OOStackElement methodsFor: 'as yet unclassified' stamp: 'GJC 9/16/2017 18:29:30'!
+value
+
+	^elementValue ! !
