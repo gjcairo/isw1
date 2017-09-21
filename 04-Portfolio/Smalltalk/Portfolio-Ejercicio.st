@@ -281,6 +281,12 @@ test20CanNotCreatePortfoliosWithAccountsManagedByOtherManagedPortfolio
 		withExceptionDo: [ :invalidPortfolio |
 			self assert: Portfolio accountAlreadyManagedErrorMessage = invalidPortfolio messageText ]! !
 
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'PortfolioTest class' category: #'Portfolio-Ejercicio'!
+PortfolioTest class
+	instanceVariableNames: 'deposit2 composedPortfolio account3 account1 account2 complexPortfolio deposit1 deposit3'!
+
 
 !classDefinition: #AccountTransaction category: #'Portfolio-Ejercicio'!
 Object subclass: #AccountTransaction
@@ -414,33 +420,34 @@ balance
 	^accounts inject: 0 into: [ :subTotal :account | subTotal + account balance]! !
 
 
-!Portfolio methodsFor: 'testing' stamp: 'HernanWilkinson 7/13/2011 18:39'!
+!Portfolio methodsFor: 'testing' stamp: 'GJC 9/21/2017 14:38:58'!
 manages: anAccount
 
-		self shouldBeImplemented 
-! !
+	^self = anAccount or: [(accounts anySatisfy: [ :anotherAcccount | anotherAcccount manages: anAccount ])]! !
 
-!Portfolio methodsFor: 'testing' stamp: 'HernanWilkinson 7/13/2011 18:39'!
-registers: aTtransaction
+!Portfolio methodsFor: 'testing' stamp: 'GJC 9/21/2017 14:30:08'!
+registers: aTransaction
 
-	self shouldBeImplemented ! !
+	^accounts anySatisfy: [ :anAccount | anAccount registers: aTransaction ]! !
 
 
-!Portfolio methodsFor: 'transactions' stamp: 'HernanWilkinson 7/13/2011 18:39'!
+!Portfolio methodsFor: 'transactions' stamp: 'GJC 9/21/2017 14:53:55'!
 transactions 
 
-	self shouldBeImplemented ! !
+	^accounts inject: (OrderedCollection new) into: [ :allTransactions :anAccount | allTransactions addAllLast: (self transactionsOf: anAccount) ]! !
 
-!Portfolio methodsFor: 'transactions' stamp: 'HernanWilkinson 7/13/2011 18:40'!
+!Portfolio methodsFor: 'transactions' stamp: 'GJC 9/21/2017 15:03:30'!
 transactionsOf: anAccount 
 
-	self shouldBeImplemented ! !
+	(self manages: anAccount) ifFalse: [ self error: self class accountNotManagedMessageDescription ].
+	^anAccount transactions! !
 
 
 !Portfolio methodsFor: 'initialization' stamp: 'GJC 9/21/2017 13:34:42'!
 initialize: aCollectionOfAccounts
 
 	accounts := aCollectionOfAccounts asSet ! !
+
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -462,6 +469,12 @@ with: anAccount1 with: anAccount2
 withAll: aCollectionOfAccounts
 
 	^self new initialize: aCollectionOfAccounts ! !
+
+
+!Portfolio class methodsFor: 'as yet unclassified' stamp: 'GJC 9/21/2017 15:04:02'!
+accountNotManagedMessageDescription
+
+	^'La cuenta debe ser administrada por el portfolio.'! !
 
 
 !classDefinition: #ReceptiveAccount category: #'Portfolio-Ejercicio'!
