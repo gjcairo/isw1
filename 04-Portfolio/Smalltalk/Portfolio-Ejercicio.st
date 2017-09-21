@@ -306,15 +306,15 @@ value
 AccountTransaction class
 	instanceVariableNames: ''!
 
-!AccountTransaction class methodsFor: 'instance creation' stamp: 'HernanWilkinson 7/13/2011 18:38'!
+!AccountTransaction class methodsFor: 'instance creation' stamp: 'GJC 9/21/2017 15:25:32'!
 register: aValue on: account
 
-	| withdraw |
+	| transaction |
 	
-	withdraw := self for: aValue.
-	account register: withdraw.
+	transaction := self for: aValue.
+	account register: transaction.
 		
-	^ withdraw! !
+	^ transaction! !
 
 
 !classDefinition: #Deposit category: #'Portfolio-Ejercicio'!
@@ -431,10 +431,10 @@ registers: aTransaction
 	^accounts anySatisfy: [ :anAccount | anAccount registers: aTransaction ]! !
 
 
-!Portfolio methodsFor: 'transactions' stamp: 'GJC 9/21/2017 14:53:55'!
+!Portfolio methodsFor: 'transactions' stamp: 'GJC 9/21/2017 15:26:02'!
 transactions 
 
-	^accounts inject: (OrderedCollection new) into: [ :allTransactions :anAccount | allTransactions addAllLast: (self transactionsOf: anAccount) ]! !
+	^accounts inject: (OrderedCollection new) into: [ :allTransactions :anAccount | allTransactions union: (self transactionsOf: anAccount) ]! !
 
 !Portfolio methodsFor: 'transactions' stamp: 'GJC 9/21/2017 15:03:30'!
 transactionsOf: anAccount 
@@ -455,10 +455,12 @@ initialize: aCollectionOfAccounts
 Portfolio class
 	instanceVariableNames: ''!
 
-!Portfolio class methodsFor: 'instance creation' stamp: 'GJC 9/21/2017 13:29:29'!
+!Portfolio class methodsFor: 'instance creation' stamp: 'GJC 9/21/2017 15:37:06'!
 with: anAccount1 with: anAccount2
 
 	| accounts |
+	
+	((anAccount1 manages: anAccount2) or: [ anAccount2 manages: anAccount1 ]) ifTrue: [ self error: self accountAlreadyManagedErrorMessage ].
 	
 	accounts := Set new.
 	accounts add: anAccount1.
@@ -470,6 +472,11 @@ withAll: aCollectionOfAccounts
 
 	^self new initialize: aCollectionOfAccounts ! !
 
+
+!Portfolio class methodsFor: 'as yet unclassified' stamp: 'GJC 9/21/2017 15:32:06'!
+accountAlreadyManagedErrorMessage
+
+	^'No puede haber cuentas repetidas en el portfolio'! !
 
 !Portfolio class methodsFor: 'as yet unclassified' stamp: 'GJC 9/21/2017 15:04:02'!
 accountNotManagedMessageDescription
