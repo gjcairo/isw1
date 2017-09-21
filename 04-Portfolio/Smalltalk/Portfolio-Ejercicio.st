@@ -403,15 +403,15 @@ balance
 
 !classDefinition: #Portfolio category: #'Portfolio-Ejercicio'!
 SummarizingAccount subclass: #Portfolio
-	instanceVariableNames: ''
+	instanceVariableNames: 'accounts'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Portfolio-Ejercicio'!
 
-!Portfolio methodsFor: 'balance' stamp: 'HernanWilkinson 7/13/2011 18:39'!
+!Portfolio methodsFor: 'balance' stamp: 'GJC 9/21/2017 13:44:14'!
 balance
 
-	self shouldBeImplemented ! !
+	^accounts inject: 0 into: [ :subTotal :account | subTotal + account balance]! !
 
 
 !Portfolio methodsFor: 'testing' stamp: 'HernanWilkinson 7/13/2011 18:39'!
@@ -436,21 +436,32 @@ transactionsOf: anAccount
 
 	self shouldBeImplemented ! !
 
+
+!Portfolio methodsFor: 'initialization' stamp: 'GJC 9/21/2017 13:34:42'!
+initialize: aCollectionOfAccounts
+
+	accounts := aCollectionOfAccounts asSet ! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Portfolio class' category: #'Portfolio-Ejercicio'!
 Portfolio class
 	instanceVariableNames: ''!
 
-!Portfolio class methodsFor: 'instance creation' stamp: 'HernanWilkinson 7/13/2011 18:41'!
+!Portfolio class methodsFor: 'instance creation' stamp: 'GJC 9/21/2017 13:29:29'!
 with: anAccount1 with: anAccount2
 
-	self shouldBeImplemented ! !
+	| accounts |
+	
+	accounts := Set new.
+	accounts add: anAccount1.
+	accounts add: anAccount2.
+	^self withAll: accounts! !
 
-!Portfolio class methodsFor: 'instance creation' stamp: 'HernanWilkinson 7/13/2011 18:41'!
+!Portfolio class methodsFor: 'instance creation' stamp: 'GJC 9/21/2017 13:34:19'!
 withAll: aCollectionOfAccounts
 
-	self shouldBeImplemented ! !
+	^self new initialize: aCollectionOfAccounts ! !
 
 
 !classDefinition: #ReceptiveAccount category: #'Portfolio-Ejercicio'!
