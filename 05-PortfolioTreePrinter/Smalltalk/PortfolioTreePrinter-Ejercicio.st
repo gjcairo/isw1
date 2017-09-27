@@ -463,20 +463,20 @@ accountSummaryLinesOf: aReceptiveAccount
 	
 	^aReceptiveAccount accountSummary! !
 
-!PortfolioTest methodsFor: 'test support' stamp: 'HernanWilkinson 9/6/2016 19:43'!
+!PortfolioTest methodsFor: 'test support' stamp: 'GJC 9/26/2017 23:34:30'!
 accountTransferNetOf: aReceptiveAccount 
 	
-	self shouldBeImplemented ! !
+	^aReceptiveAccount transferNet! !
 
-!PortfolioTest methodsFor: 'test support' stamp: 'HernanWilkinson 9/6/2016 19:43'!
+!PortfolioTest methodsFor: 'test support' stamp: 'GJC 9/27/2017 00:12:15'!
 investmentEarningsOf: aReceptiveAccount 
 	
-	self shouldBeImplemented ! !
+	^aReceptiveAccount investmentEarnings! !
 
-!PortfolioTest methodsFor: 'test support' stamp: 'HernanWilkinson 9/6/2016 19:43'!
+!PortfolioTest methodsFor: 'test support' stamp: 'GJC 9/26/2017 23:57:38'!
 investmentNetOf: aReceptiveAccount 
 	
-	self shouldBeImplemented ! !
+	^aReceptiveAccount investmentNet! !
 
 !PortfolioTest methodsFor: 'test support' stamp: 'HernanWilkinson 9/6/2016 19:43'!
 portofolioTreeOf: aPortfolio namingAccountWith: aDictionary 
@@ -496,14 +496,35 @@ Object subclass: #AccountTransaction
 	poolDictionaries: ''
 	category: 'PortfolioTreePrinter-Ejercicio'!
 
+!AccountTransaction methodsFor: 'evaluating' stamp: 'GJC 9/26/2017 22:33:07'!
+accountSummaryLine
+
+	self subclassResponsibility ! !
+
 !AccountTransaction methodsFor: 'evaluating' stamp: 'ST 9/25/2017 20:44:11'!
 updateBalance: anAmount
+
+	self subclassResponsibility ! !
+
+!AccountTransaction methodsFor: 'evaluating' stamp: 'GJC 9/26/2017 23:59:06'!
+updateInvestmentNet: anAmount
+
+	self subclassResponsibility ! !
+
+!AccountTransaction methodsFor: 'evaluating' stamp: 'GJC 9/26/2017 23:35:54'!
+updateTransferNet: anAmount
 
 	self subclassResponsibility ! !
 
 !AccountTransaction methodsFor: 'evaluating' stamp: 'HernanWilkinson 7/14/2011 06:48'!
 value
 
+	self subclassResponsibility ! !
+
+
+!AccountTransaction methodsFor: 'as yet unclassified' stamp: 'GJC 9/27/2017 00:13:54'!
+updateInvestmentEarnings: anAmount
+	
 	self subclassResponsibility ! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
@@ -530,6 +551,54 @@ AccountTransaction subclass: #CertificateOfDeposit
 	poolDictionaries: ''
 	category: 'PortfolioTreePrinter-Ejercicio'!
 
+!CertificateOfDeposit methodsFor: 'as yet unclassified' stamp: 'GJC 9/27/2017 00:21:12'!
+accountSummaryLine
+
+	^ 'Plazo fijo por ', value printString, ' durante ', numberOfDays printString, ' dias a una tna de ', (tna * 100) printString, '%'! !
+
+!CertificateOfDeposit methodsFor: 'as yet unclassified' stamp: 'GJC 9/26/2017 23:55:32'!
+initializeFor: anAmount during: aNumberOfDays at: anInterest 
+	
+	value := anAmount.
+	numberOfDays := aNumberOfDays.
+	tna := anInterest! !
+
+!CertificateOfDeposit methodsFor: 'as yet unclassified' stamp: 'GJC 9/26/2017 22:09:28'!
+updateBalance: anAmount
+
+	^anAmount - self value! !
+
+!CertificateOfDeposit methodsFor: 'as yet unclassified' stamp: 'GJC 9/27/2017 00:15:27'!
+updateInvestmentEarnings: anAmount
+	
+	^ anAmount  + (value * (tna / 360) * numberOfDays)! !
+
+!CertificateOfDeposit methodsFor: 'as yet unclassified' stamp: 'GJC 9/26/2017 23:58:55'!
+updateInvestmentNet: anAmount
+
+	^anAmount + self value! !
+
+!CertificateOfDeposit methodsFor: 'as yet unclassified' stamp: 'GJC 9/26/2017 23:36:13'!
+updateTransferNet: anAmount
+
+	^anAmount! !
+
+!CertificateOfDeposit methodsFor: 'as yet unclassified' stamp: 'GJC 9/26/2017 22:09:13'!
+value
+
+	^value! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'CertificateOfDeposit class' category: #'PortfolioTreePrinter-Ejercicio'!
+CertificateOfDeposit class
+	instanceVariableNames: ''!
+
+!CertificateOfDeposit class methodsFor: 'as yet unclassified' stamp: 'GJC 9/26/2017 23:56:27'!
+register: anAmount during: aNumberOfDays at: anInterest on: anAccount
+
+	anAccount register: (self new initializeFor: anAmount during: aNumberOfDays at: anInterest)! !
+
 
 !classDefinition: #Deposit category: #'PortfolioTreePrinter-Ejercicio'!
 AccountTransaction subclass: #Deposit
@@ -543,6 +612,26 @@ initializeFor: aValue
 
 	value := aValue ! !
 
+!Deposit methodsFor: 'initialization' stamp: 'GJC 9/27/2017 00:15:37'!
+updateInvestmentEarnings: anAmount
+	
+	^ anAmount! !
+
+!Deposit methodsFor: 'initialization' stamp: 'GJC 9/26/2017 23:59:42'!
+updateInvestmentNet: anAmount
+
+	^anAmount! !
+
+!Deposit methodsFor: 'initialization' stamp: 'GJC 9/26/2017 23:36:18'!
+updateTransferNet: anAmount
+
+	^anAmount! !
+
+
+!Deposit methodsFor: 'value' stamp: 'GJC 9/26/2017 22:37:11'!
+accountSummaryLine
+
+	^'Deposito por ', self value printString! !
 
 !Deposit methodsFor: 'value' stamp: 'ST 9/25/2017 20:43:39'!
 updateBalance: anAmount
@@ -576,41 +665,134 @@ register: aValue on: account
 	^ withdraw! !
 
 
-!classDefinition: #Transfer category: #'PortfolioTreePrinter-Ejercicio'!
-AccountTransaction subclass: #Transfer
-	instanceVariableNames: 'value sourceAccount targetAccount'
+!classDefinition: #IncomingTransfer category: #'PortfolioTreePrinter-Ejercicio'!
+AccountTransaction subclass: #IncomingTransfer
+	instanceVariableNames: 'value transfer'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'PortfolioTreePrinter-Ejercicio'!
 
-!Transfer methodsFor: 'as yet unclassified' stamp: 'ST 9/25/2017 21:20:56'!
-initializeWithAmount: anAmount from: fromAccount to: toAccount
+!IncomingTransfer methodsFor: 'as yet unclassified' stamp: 'GJC 9/26/2017 22:36:58'!
+accountSummaryLine
 
-	value := anAmount .
-	sourceAccount := fromAccount.
-	targetAccount := toAccount.
-! !
+	^'Transferencia por ', self value printString ! !
 
-!Transfer methodsFor: 'as yet unclassified' stamp: 'ST 9/25/2017 21:22:59'!
-updateBalance: anAmount! !
+!IncomingTransfer methodsFor: 'as yet unclassified' stamp: 'GJC 9/26/2017 22:28:51'!
+initializeFor: anAmount with: aTransfer
 
-!Transfer methodsFor: 'as yet unclassified' stamp: 'ST 9/25/2017 21:22:34'!
+	value := anAmount.
+	transfer := aTransfer! !
+
+!IncomingTransfer methodsFor: 'as yet unclassified' stamp: 'GJC 9/26/2017 22:08:20'!
+updateBalance: anAmount
+
+	^anAmount + self value! !
+
+!IncomingTransfer methodsFor: 'as yet unclassified' stamp: 'GJC 9/27/2017 00:15:41'!
+updateInvestmentEarnings: anAmount
+	
+	^ anAmount! !
+
+!IncomingTransfer methodsFor: 'as yet unclassified' stamp: 'GJC 9/26/2017 23:59:48'!
+updateInvestmentNet: anAmount
+
+	^anAmount! !
+
+!IncomingTransfer methodsFor: 'as yet unclassified' stamp: 'GJC 9/26/2017 23:36:27'!
+updateTransferNet: anAmount
+
+	^anAmount + self value! !
+
+!IncomingTransfer methodsFor: 'as yet unclassified' stamp: 'GJC 9/26/2017 22:08:33'!
 value
 
 	^value! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Transfer class' category: #'PortfolioTreePrinter-Ejercicio'!
-Transfer class
+!classDefinition: 'IncomingTransfer class' category: #'PortfolioTreePrinter-Ejercicio'!
+IncomingTransfer class
 	instanceVariableNames: ''!
 
-!Transfer class methodsFor: 'as yet unclassified' stamp: 'ST 9/25/2017 21:19:56'!
-register: anAmount from: fromAccount to: toAccount 
+!IncomingTransfer class methodsFor: 'as yet unclassified' stamp: 'GJC 9/26/2017 22:27:42'!
+for: anAmount with: aTransfer
+
+	^self new initializeFor: anAmount with: aTransfer! !
+
+!IncomingTransfer class methodsFor: 'as yet unclassified' stamp: 'GJC 9/26/2017 22:26:33'!
+register: aValue on: anAccount with: aTransfer
+
+	| incomingTransfer |
 	
-	self new initializeWithAmount: anAmount from: fromAccount to: toAccount.
-	fromAccount register: self.
-	toAccount register: self.! !
+	incomingTransfer := self for: aValue with: aTransfer.
+	anAccount register: incomingTransfer.
+
+	^ incomingTransfer! !
+
+
+!classDefinition: #OutgoingTransfer category: #'PortfolioTreePrinter-Ejercicio'!
+AccountTransaction subclass: #OutgoingTransfer
+	instanceVariableNames: 'value transfer'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PortfolioTreePrinter-Ejercicio'!
+
+!OutgoingTransfer methodsFor: 'as yet unclassified' stamp: 'GJC 9/26/2017 22:37:52'!
+accountSummaryLine
+
+	^'Transferencia por ', self value negated printString ! !
+
+!OutgoingTransfer methodsFor: 'as yet unclassified' stamp: 'GJC 9/26/2017 22:28:58'!
+initializeFor: anAmount with: aTransfer
+
+	value := anAmount.
+	transfer := aTransfer! !
+
+!OutgoingTransfer methodsFor: 'as yet unclassified' stamp: 'GJC 9/26/2017 22:08:47'!
+updateBalance: anAmount
+
+	^anAmount - self value! !
+
+!OutgoingTransfer methodsFor: 'as yet unclassified' stamp: 'GJC 9/27/2017 00:15:46'!
+updateInvestmentEarnings: anAmount
+	
+	^ anAmount! !
+
+!OutgoingTransfer methodsFor: 'as yet unclassified' stamp: 'GJC 9/26/2017 23:59:52'!
+updateInvestmentNet: anAmount
+
+	^anAmount! !
+
+!OutgoingTransfer methodsFor: 'as yet unclassified' stamp: 'GJC 9/26/2017 23:36:34'!
+updateTransferNet: anAmount
+
+	^anAmount - self value! !
+
+!OutgoingTransfer methodsFor: 'as yet unclassified' stamp: 'GJC 9/26/2017 22:08:53'!
+value
+
+	^value! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'OutgoingTransfer class' category: #'PortfolioTreePrinter-Ejercicio'!
+OutgoingTransfer class
+	instanceVariableNames: ''!
+
+!OutgoingTransfer class methodsFor: 'as yet unclassified' stamp: 'GJC 9/26/2017 22:27:30'!
+for: anAmount with: aTransfer
+
+	^self new initializeFor: anAmount with: aTransfer! !
+
+!OutgoingTransfer class methodsFor: 'as yet unclassified' stamp: 'GJC 9/26/2017 22:26:58'!
+register: aValue on: anAccount with: aTransfer
+
+	| outgoingTransfer |
+	
+	outgoingTransfer := self for: aValue with: aTransfer.
+	anAccount register: outgoingTransfer.
+
+	^ outgoingTransfer! !
 
 
 !classDefinition: #Withdraw category: #'PortfolioTreePrinter-Ejercicio'!
@@ -619,6 +801,11 @@ AccountTransaction subclass: #Withdraw
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'PortfolioTreePrinter-Ejercicio'!
+
+!Withdraw methodsFor: 'initialization' stamp: 'GJC 9/26/2017 22:37:27'!
+accountSummaryLine
+
+	^'Extraccion por ', self value printString! !
 
 !Withdraw methodsFor: 'initialization' stamp: 'HernanWilkinson 7/13/2011 18:46'!
 initializeFor: aValue
@@ -630,6 +817,21 @@ updateBalance: anAmount
 
 	^anAmount - self value! !
 
+!Withdraw methodsFor: 'initialization' stamp: 'GJC 9/26/2017 23:59:59'!
+updateInvestmentNet: anAmount
+
+	^anAmount! !
+
+!Withdraw methodsFor: 'initialization' stamp: 'GJC 9/26/2017 23:36:38'!
+updateTransferNet: anAmount
+
+	^anAmount! !
+
+
+!Withdraw methodsFor: 'value' stamp: 'GJC 9/27/2017 00:15:53'!
+updateInvestmentEarnings: anAmount
+	
+	^ anAmount! !
 
 !Withdraw methodsFor: 'value' stamp: 'HernanWilkinson 7/14/2011 05:54'!
 value
@@ -805,15 +1007,20 @@ initialize
 	transactions := OrderedCollection new.! !
 
 
-!ReceptiveAccount methodsFor: 'transactions' stamp: 'ST 9/25/2017 21:09:34'!
+!ReceptiveAccount methodsFor: 'transactions' stamp: 'GJC 9/26/2017 23:12:04'!
 accountSummary
 
-	^transactions inject: (OrderedCollection new) into: [ :lines :nextTransaction | lines add: 1]! !
+	^transactions inject: (OrderedCollection new) into: [ :lines :nextTransaction | lines add: nextTransaction accountSummaryLine; yourself ]! !
 
-!ReceptiveAccount methodsFor: 'transactions' stamp: 'ST 9/25/2017 20:44:42'!
+!ReceptiveAccount methodsFor: 'transactions' stamp: 'GJC 9/26/2017 23:37:07'!
 balance
 
-	^ transactions inject: 0 into: [ :balance :transaction | transaction updateBalance: balance ]! !
+	^ transactions inject: 0 into: [ :net :transaction | transaction updateBalance: net ]! !
+
+!ReceptiveAccount methodsFor: 'transactions' stamp: 'GJC 9/26/2017 23:59:28'!
+investmentNet
+
+	^ transactions inject: 0 into: [ :net :transaction | transaction updateInvestmentNet: net ]! !
 
 !ReceptiveAccount methodsFor: 'transactions' stamp: 'HernanWilkinson 7/13/2011 18:37'!
 register: aTransaction
@@ -825,6 +1032,11 @@ register: aTransaction
 transactions 
 
 	^ transactions copy! !
+
+!ReceptiveAccount methodsFor: 'transactions' stamp: 'GJC 9/26/2017 23:37:01'!
+transferNet
+
+	^ transactions inject: 0 into: [ :net :transaction | transaction updateTransferNet: net ]! !
 
 
 !ReceptiveAccount methodsFor: 'testing' stamp: 'HernanWilkinson 7/13/2011 18:37'!
@@ -838,3 +1050,38 @@ registers: aTtransaction
 
 	^ transactions includes: aTtransaction 
 ! !
+
+
+!ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'GJC 9/27/2017 00:13:23'!
+investmentEarnings
+	
+	^ transactions inject: 0 into: [ :earnings :transaction | transaction updateInvestmentEarnings: earnings ]! !
+
+
+!classDefinition: #Transfer category: #'PortfolioTreePrinter-Ejercicio'!
+Object subclass: #Transfer
+	instanceVariableNames: 'value sourceAccount targetAccount'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PortfolioTreePrinter-Ejercicio'!
+
+!Transfer methodsFor: 'as yet unclassified' stamp: 'GJC 9/26/2017 22:30:39'!
+initializeWithAmount: anAmount from: fromAccount to: toAccount
+
+	value := anAmount .
+	sourceAccount := fromAccount.
+	targetAccount := toAccount.
+
+	OutgoingTransfer register: value on: sourceAccount with: self.
+	IncomingTransfer register: value on: targetAccount with: self! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'Transfer class' category: #'PortfolioTreePrinter-Ejercicio'!
+Transfer class
+	instanceVariableNames: ''!
+
+!Transfer class methodsFor: 'as yet unclassified' stamp: 'GJC 9/26/2017 22:31:01'!
+register: anAmount from: fromAccount to: toAccount 
+	
+	self new initializeWithAmount: anAmount from: fromAccount to: toAccount! !
