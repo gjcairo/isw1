@@ -403,7 +403,7 @@ test27ShouldBeAbleToBeQueryTransferNetWithCertificateOfDeposit
 	self assert: 150 = (self accountTransferNetOf: fromAccount).
 	self assert: -150 = (self accountTransferNetOf: toAccount).! !
 
-!PortfolioTest methodsFor: 'tests' stamp: 'HernanWilkinson 9/26/2011 16:29'!
+!PortfolioTest methodsFor: 'tests' stamp: 'GJC 9/28/2017 02:11:28'!
 test28PortfolioTreePrinterPrintsTheCompositeInDepthFirstOrder
 
 	| account1 account2 account3 complexPortfolio composedPortfolio accountNames lines |
@@ -421,7 +421,7 @@ test28PortfolioTreePrinterPrintsTheCompositeInDepthFirstOrder
 	accountNames at: account2 put: 'account2'.
 	accountNames at: account3 put: 'account3'.
 		
-	lines := self portofolioTreeOf: composedPortfolio namingAccountWith: accountNames.
+	lines := self portfolioTreeOf: composedPortfolio namingAccountWith: accountNames.
 		
 	self assert: 5 = lines size.
 	self assert: 'composedPortfolio' = (lines at: 1).
@@ -430,7 +430,7 @@ test28PortfolioTreePrinterPrintsTheCompositeInDepthFirstOrder
 	self assert: '  account2' = (lines at: 4).
 	self assert: ' account3' = (lines at: 5).! !
 
-!PortfolioTest methodsFor: 'tests' stamp: 'HernanWilkinson 9/26/2011 16:30'!
+!PortfolioTest methodsFor: 'tests' stamp: 'GJC 9/28/2017 03:14:49'!
 test29ReversePortfolioTreePrinterPrintsTheCompositeStartingFromTheLeaves
 
 	| account1 account2 account3 complexPortfolio composedPortfolio accountNames lines |
@@ -447,7 +447,7 @@ test29ReversePortfolioTreePrinterPrintsTheCompositeStartingFromTheLeaves
 	accountNames at: account2 put: 'account2'.
 	accountNames at: account3 put: 'account3'.
 		
-	lines := self reversePortofolioTreeOf: composedPortfolio namingAccountWith: accountNames.
+	lines := self reversePortfolioTreeOf: composedPortfolio namingAccountWith: accountNames.
 		
 	self assert: 5 = lines size.
 	self assert: ' account3' = (lines at: 1).
@@ -458,35 +458,124 @@ test29ReversePortfolioTreePrinterPrintsTheCompositeStartingFromTheLeaves
 	! !
 
 
-!PortfolioTest methodsFor: 'test support' stamp: 'ST 9/25/2017 20:54:34'!
+!PortfolioTest methodsFor: 'test support' stamp: 'GJC 9/28/2017 01:45:41'!
 accountSummaryLinesOf: aReceptiveAccount 
 	
-	^aReceptiveAccount accountSummary! !
+	^ AccountSummary of: aReceptiveAccount ! !
 
-!PortfolioTest methodsFor: 'test support' stamp: 'GJC 9/26/2017 23:34:30'!
+!PortfolioTest methodsFor: 'test support' stamp: 'GJC 9/28/2017 02:01:41'!
 accountTransferNetOf: aReceptiveAccount 
 	
-	^aReceptiveAccount transferNet! !
+	^ TransferNet of: aReceptiveAccount ! !
 
-!PortfolioTest methodsFor: 'test support' stamp: 'GJC 9/27/2017 00:12:15'!
+!PortfolioTest methodsFor: 'test support' stamp: 'GJC 9/28/2017 02:04:48'!
 investmentEarningsOf: aReceptiveAccount 
 	
-	^aReceptiveAccount investmentEarnings! !
+	^ InvestmentEarnings of: aReceptiveAccount ! !
 
-!PortfolioTest methodsFor: 'test support' stamp: 'GJC 9/26/2017 23:57:38'!
+!PortfolioTest methodsFor: 'test support' stamp: 'GJC 9/28/2017 02:05:05'!
 investmentNetOf: aReceptiveAccount 
 	
-	^aReceptiveAccount investmentNet! !
+	^ InvestmentNet of: aReceptiveAccount ! !
 
-!PortfolioTest methodsFor: 'test support' stamp: 'HernanWilkinson 9/6/2016 19:43'!
-portofolioTreeOf: aPortfolio namingAccountWith: aDictionary 
-	
-	self shouldBeImplemented ! !
+!PortfolioTest methodsFor: 'test support' stamp: 'GJC 9/28/2017 02:13:26'!
+portfolioTreeOf: aPortfolio namingAccountWith: aDictionary
 
-!PortfolioTest methodsFor: 'test support' stamp: 'HernanWilkinson 9/6/2016 19:43'!
-reversePortofolioTreeOf: aPortfolio namingAccountWith: aDictionary 
-	
-	self shouldBeImplemented ! !
+	^ PortfolioTree of: aPortfolio withNames: aDictionary ! !
+
+!PortfolioTest methodsFor: 'test support' stamp: 'GJC 9/28/2017 03:16:04'!
+reversePortfolioTreeOf: aPortfolio namingAccountWith: aDictionary
+
+	^ ReversePortfolioTree of: aPortfolio withNames: aDictionary ! !
+
+
+!classDefinition: #AccountOperation category: #'PortfolioTreePrinter-Ejercicio'!
+Object subclass: #AccountOperation
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PortfolioTreePrinter-Ejercicio'!
+
+!AccountOperation methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 00:50:09'!
+applyTo: anAccount
+
+	self subclassResponsibility ! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'AccountOperation class' category: #'PortfolioTreePrinter-Ejercicio'!
+AccountOperation class
+	instanceVariableNames: ''!
+
+!AccountOperation class methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 01:28:27'!
+of: anAccount
+
+	^self new applyTo: anAccount! !
+
+
+!classDefinition: #AccountBalance category: #'PortfolioTreePrinter-Ejercicio'!
+AccountOperation subclass: #AccountBalance
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PortfolioTreePrinter-Ejercicio'!
+
+!AccountBalance methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 00:55:16'!
+applyTo: anAccount
+
+	^ anAccount transactions inject: 0 into: [ :net :transaction | transaction valueFor: (UpdateBalance with: net) ]! !
+
+
+!classDefinition: #AccountSummary category: #'PortfolioTreePrinter-Ejercicio'!
+AccountOperation subclass: #AccountSummary
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PortfolioTreePrinter-Ejercicio'!
+
+!AccountSummary methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 01:32:03'!
+applyTo: anAccount
+
+	^ anAccount transactions inject: (OrderedCollection new) into: [ :lines :nextTransaction | nextTransaction valueFor: (UpdateAccountSummary with: lines) ]! !
+
+
+!classDefinition: #InvestmentEarnings category: #'PortfolioTreePrinter-Ejercicio'!
+AccountOperation subclass: #InvestmentEarnings
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PortfolioTreePrinter-Ejercicio'!
+
+!InvestmentEarnings methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 02:03:30'!
+applyTo: anAccount
+
+	^ anAccount transactions inject: 0 into: [ :earnings :transaction | transaction valueFor: (UpdateInvestmentEarnings with: earnings) ]! !
+
+
+!classDefinition: #InvestmentNet category: #'PortfolioTreePrinter-Ejercicio'!
+AccountOperation subclass: #InvestmentNet
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PortfolioTreePrinter-Ejercicio'!
+
+!InvestmentNet methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 02:04:06'!
+applyTo: anAccount
+
+	^ anAccount transactions inject: 0 into: [ :earnings :transaction | transaction valueFor: (UpdateInvestmentNet with: earnings) ]! !
+
+
+!classDefinition: #TransferNet category: #'PortfolioTreePrinter-Ejercicio'!
+AccountOperation subclass: #TransferNet
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PortfolioTreePrinter-Ejercicio'!
+
+!TransferNet methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 02:04:22'!
+applyTo: anAccount
+
+	^ anAccount transactions inject: 0 into: [ :earnings :transaction | transaction valueFor: (UpdateTransferNet with: earnings) ]! !
 
 
 !classDefinition: #AccountTransaction category: #'PortfolioTreePrinter-Ejercicio'!
@@ -498,11 +587,6 @@ Object subclass: #AccountTransaction
 
 !AccountTransaction methodsFor: 'evaluating' stamp: 'GJC 9/26/2017 22:33:07'!
 accountSummaryLine
-
-	self subclassResponsibility ! !
-
-!AccountTransaction methodsFor: 'evaluating' stamp: 'ST 9/25/2017 20:44:11'!
-updateBalance: anAmount
 
 	self subclassResponsibility ! !
 
@@ -518,6 +602,11 @@ updateTransferNet: anAmount
 
 !AccountTransaction methodsFor: 'evaluating' stamp: 'HernanWilkinson 7/14/2011 06:48'!
 value
+
+	self subclassResponsibility ! !
+
+!AccountTransaction methodsFor: 'evaluating' stamp: 'GJC 9/28/2017 01:04:44'!
+valueFor: aTransactionOperation
 
 	self subclassResponsibility ! !
 
@@ -551,11 +640,6 @@ AccountTransaction subclass: #CertificateOfDeposit
 	poolDictionaries: ''
 	category: 'PortfolioTreePrinter-Ejercicio'!
 
-!CertificateOfDeposit methodsFor: 'as yet unclassified' stamp: 'GJC 9/27/2017 00:21:12'!
-accountSummaryLine
-
-	^ 'Plazo fijo por ', value printString, ' durante ', numberOfDays printString, ' dias a una tna de ', (tna * 100) printString, '%'! !
-
 !CertificateOfDeposit methodsFor: 'as yet unclassified' stamp: 'GJC 9/26/2017 23:55:32'!
 initializeFor: anAmount during: aNumberOfDays at: anInterest 
 	
@@ -563,30 +647,26 @@ initializeFor: anAmount during: aNumberOfDays at: anInterest
 	numberOfDays := aNumberOfDays.
 	tna := anInterest! !
 
-!CertificateOfDeposit methodsFor: 'as yet unclassified' stamp: 'GJC 9/26/2017 22:09:28'!
-updateBalance: anAmount
+!CertificateOfDeposit methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 01:40:47'!
+tna
 
-	^anAmount - self value! !
-
-!CertificateOfDeposit methodsFor: 'as yet unclassified' stamp: 'GJC 9/27/2017 00:15:27'!
-updateInvestmentEarnings: anAmount
-	
-	^ anAmount  + (value * (tna / 360) * numberOfDays)! !
-
-!CertificateOfDeposit methodsFor: 'as yet unclassified' stamp: 'GJC 9/26/2017 23:58:55'!
-updateInvestmentNet: anAmount
-
-	^anAmount + self value! !
-
-!CertificateOfDeposit methodsFor: 'as yet unclassified' stamp: 'GJC 9/26/2017 23:36:13'!
-updateTransferNet: anAmount
-
-	^anAmount! !
+	^tna! !
 
 !CertificateOfDeposit methodsFor: 'as yet unclassified' stamp: 'GJC 9/26/2017 22:09:13'!
 value
 
 	^value! !
+
+!CertificateOfDeposit methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 01:21:26'!
+valueFor: aTransactionOperation
+
+	^ aTransactionOperation applyToCertificateOfDeposit: self! !
+
+
+!CertificateOfDeposit methodsFor: 'accessing' stamp: 'GJC 9/28/2017 01:48:02'!
+numberOfDays
+	
+	^numberOfDays! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -612,36 +692,16 @@ initializeFor: aValue
 
 	value := aValue ! !
 
-!Deposit methodsFor: 'initialization' stamp: 'GJC 9/27/2017 00:15:37'!
-updateInvestmentEarnings: anAmount
-	
-	^ anAmount! !
-
-!Deposit methodsFor: 'initialization' stamp: 'GJC 9/26/2017 23:59:42'!
-updateInvestmentNet: anAmount
-
-	^anAmount! !
-
-!Deposit methodsFor: 'initialization' stamp: 'GJC 9/26/2017 23:36:18'!
-updateTransferNet: anAmount
-
-	^anAmount! !
-
-
-!Deposit methodsFor: 'value' stamp: 'GJC 9/26/2017 22:37:11'!
-accountSummaryLine
-
-	^'Deposito por ', self value printString! !
-
-!Deposit methodsFor: 'value' stamp: 'ST 9/25/2017 20:43:39'!
-updateBalance: anAmount
-
-	^anAmount + self value! !
 
 !Deposit methodsFor: 'value' stamp: 'HernanWilkinson 7/13/2011 18:38'!
 value
 
 	^ value! !
+
+!Deposit methodsFor: 'value' stamp: 'GJC 9/28/2017 01:05:49'!
+valueFor: aTransactionOperation
+
+	^ aTransactionOperation applyToDeposit: self! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -672,41 +732,21 @@ AccountTransaction subclass: #IncomingTransfer
 	poolDictionaries: ''
 	category: 'PortfolioTreePrinter-Ejercicio'!
 
-!IncomingTransfer methodsFor: 'as yet unclassified' stamp: 'GJC 9/26/2017 22:36:58'!
-accountSummaryLine
-
-	^'Transferencia por ', self value printString ! !
-
 !IncomingTransfer methodsFor: 'as yet unclassified' stamp: 'GJC 9/26/2017 22:28:51'!
 initializeFor: anAmount with: aTransfer
 
 	value := anAmount.
 	transfer := aTransfer! !
 
-!IncomingTransfer methodsFor: 'as yet unclassified' stamp: 'GJC 9/26/2017 22:08:20'!
-updateBalance: anAmount
-
-	^anAmount + self value! !
-
-!IncomingTransfer methodsFor: 'as yet unclassified' stamp: 'GJC 9/27/2017 00:15:41'!
-updateInvestmentEarnings: anAmount
-	
-	^ anAmount! !
-
-!IncomingTransfer methodsFor: 'as yet unclassified' stamp: 'GJC 9/26/2017 23:59:48'!
-updateInvestmentNet: anAmount
-
-	^anAmount! !
-
-!IncomingTransfer methodsFor: 'as yet unclassified' stamp: 'GJC 9/26/2017 23:36:27'!
-updateTransferNet: anAmount
-
-	^anAmount + self value! !
-
 !IncomingTransfer methodsFor: 'as yet unclassified' stamp: 'GJC 9/26/2017 22:08:33'!
 value
 
 	^value! !
+
+!IncomingTransfer methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 01:20:54'!
+valueFor: aTransactionOperation
+
+	^ aTransactionOperation applyToIncomingTransfer: self! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -737,41 +777,21 @@ AccountTransaction subclass: #OutgoingTransfer
 	poolDictionaries: ''
 	category: 'PortfolioTreePrinter-Ejercicio'!
 
-!OutgoingTransfer methodsFor: 'as yet unclassified' stamp: 'GJC 9/26/2017 22:37:52'!
-accountSummaryLine
-
-	^'Transferencia por ', self value negated printString ! !
-
 !OutgoingTransfer methodsFor: 'as yet unclassified' stamp: 'GJC 9/26/2017 22:28:58'!
 initializeFor: anAmount with: aTransfer
 
 	value := anAmount.
 	transfer := aTransfer! !
 
-!OutgoingTransfer methodsFor: 'as yet unclassified' stamp: 'GJC 9/26/2017 22:08:47'!
-updateBalance: anAmount
-
-	^anAmount - self value! !
-
-!OutgoingTransfer methodsFor: 'as yet unclassified' stamp: 'GJC 9/27/2017 00:15:46'!
-updateInvestmentEarnings: anAmount
-	
-	^ anAmount! !
-
-!OutgoingTransfer methodsFor: 'as yet unclassified' stamp: 'GJC 9/26/2017 23:59:52'!
-updateInvestmentNet: anAmount
-
-	^anAmount! !
-
-!OutgoingTransfer methodsFor: 'as yet unclassified' stamp: 'GJC 9/26/2017 23:36:34'!
-updateTransferNet: anAmount
-
-	^anAmount - self value! !
-
 !OutgoingTransfer methodsFor: 'as yet unclassified' stamp: 'GJC 9/26/2017 22:08:53'!
 value
 
 	^value! !
+
+!OutgoingTransfer methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 01:21:03'!
+valueFor: aTransactionOperation
+
+	^ aTransactionOperation applyToOutgoingTransfer: self! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -802,41 +822,21 @@ AccountTransaction subclass: #Withdraw
 	poolDictionaries: ''
 	category: 'PortfolioTreePrinter-Ejercicio'!
 
-!Withdraw methodsFor: 'initialization' stamp: 'GJC 9/26/2017 22:37:27'!
-accountSummaryLine
-
-	^'Extraccion por ', self value printString! !
-
 !Withdraw methodsFor: 'initialization' stamp: 'HernanWilkinson 7/13/2011 18:46'!
 initializeFor: aValue
 
 	value := aValue ! !
 
-!Withdraw methodsFor: 'initialization' stamp: 'ST 9/25/2017 20:42:25'!
-updateBalance: anAmount
-
-	^anAmount - self value! !
-
-!Withdraw methodsFor: 'initialization' stamp: 'GJC 9/26/2017 23:59:59'!
-updateInvestmentNet: anAmount
-
-	^anAmount! !
-
-!Withdraw methodsFor: 'initialization' stamp: 'GJC 9/26/2017 23:36:38'!
-updateTransferNet: anAmount
-
-	^anAmount! !
-
-
-!Withdraw methodsFor: 'value' stamp: 'GJC 9/27/2017 00:15:53'!
-updateInvestmentEarnings: anAmount
-	
-	^ anAmount! !
 
 !Withdraw methodsFor: 'value' stamp: 'HernanWilkinson 7/14/2011 05:54'!
 value
 
 	^ value ! !
+
+!Withdraw methodsFor: 'value' stamp: 'GJC 9/28/2017 01:21:17'!
+valueFor: aTransactionOperation
+
+	^ aTransactionOperation applyToWithdraw: self! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -860,6 +860,54 @@ register: aValue on: account
 	^ withdraw! !
 
 
+!classDefinition: #PortfolioTree category: #'PortfolioTreePrinter-Ejercicio'!
+Object subclass: #PortfolioTree
+	instanceVariableNames: 'indentLevel names'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PortfolioTreePrinter-Ejercicio'!
+
+!PortfolioTree methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 03:07:14'!
+applyTo: aPortfolio withNames: aDictionary
+
+	^ aPortfolio valueFor: (UpdatePortfolioTree withLines: (OrderedCollection new) names: aDictionary indentLevel: 0).! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'PortfolioTree class' category: #'PortfolioTreePrinter-Ejercicio'!
+PortfolioTree class
+	instanceVariableNames: ''!
+
+!PortfolioTree class methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 02:17:06'!
+of: aPortfolio withNames: aDictionary
+
+	^ self new applyTo: aPortfolio withNames: aDictionary ! !
+
+
+!classDefinition: #ReversePortfolioTree category: #'PortfolioTreePrinter-Ejercicio'!
+Object subclass: #ReversePortfolioTree
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PortfolioTreePrinter-Ejercicio'!
+
+!ReversePortfolioTree methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 03:17:59'!
+applyTo: aPortfolio withNames: aDictionary
+
+	^ (PortfolioTree of: aPortfolio withNames: aDictionary) reverse ! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'ReversePortfolioTree class' category: #'PortfolioTreePrinter-Ejercicio'!
+ReversePortfolioTree class
+	instanceVariableNames: ''!
+
+!ReversePortfolioTree class methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 03:17:00'!
+of: aPortfolio withNames: aDictionary
+
+	^ self new applyTo: aPortfolio withNames: aDictionary ! !
+
+
 !classDefinition: #SummarizingAccount category: #'PortfolioTreePrinter-Ejercicio'!
 Object subclass: #SummarizingAccount
 	instanceVariableNames: ''
@@ -877,11 +925,21 @@ registers: aTransaction
 
 	self subclassResponsibility ! !
 
-
-!SummarizingAccount methodsFor: 'transactions' stamp: 'HernanWilkinson 7/13/2011 18:34'!
-balance
+!SummarizingAccount methodsFor: 'testing' stamp: 'GJC 9/28/2017 03:06:32'!
+valueFor: anAccountOperation
 
 	self subclassResponsibility ! !
+
+
+!SummarizingAccount methodsFor: 'transactions' stamp: 'GJC 9/28/2017 00:37:23'!
+applyOperation: anOperation
+
+	self subclassResponsibility! !
+
+!SummarizingAccount methodsFor: 'transactions' stamp: 'GJC 9/28/2017 01:24:50'!
+balance
+
+	^ AccountBalance of: self! !
 
 !SummarizingAccount methodsFor: 'transactions' stamp: 'HernanWilkinson 7/13/2011 18:35'!
 transactions
@@ -907,11 +965,10 @@ registers: aTransaction
 	^ accounts anySatisfy: [ :anAccount | anAccount registers: aTransaction ]  ! !
 
 
-!Portfolio methodsFor: 'transactions' stamp: 'HAW 8/13/2017 17:47:44'!
-balance
+!Portfolio methodsFor: 'transactions' stamp: 'GJC 9/28/2017 02:21:56'!
+accounts
 
-	^ accounts sum: [ :account | account balance ]
-! !
+	^ accounts! !
 
 !Portfolio methodsFor: 'transactions' stamp: 'HernanWilkinson 7/13/2011 19:23'!
 transactions 
@@ -926,6 +983,11 @@ transactionsOf: anAccount
 		ifTrue: [ anAccount transactions ] 
 		ifFalse: [ self error: self class accountNotManagedMessageDescription]
 	! !
+
+!Portfolio methodsFor: 'transactions' stamp: 'GJC 9/28/2017 03:05:38'!
+valueFor: anAccountOperation
+
+	^ anAccountOperation applyToPortfolio: self! !
 
 
 !Portfolio methodsFor: 'initialization' stamp: 'HernanWilkinson 7/13/2011 19:19'!
@@ -1007,21 +1069,6 @@ initialize
 	transactions := OrderedCollection new.! !
 
 
-!ReceptiveAccount methodsFor: 'transactions' stamp: 'GJC 9/26/2017 23:12:04'!
-accountSummary
-
-	^transactions inject: (OrderedCollection new) into: [ :lines :nextTransaction | lines add: nextTransaction accountSummaryLine; yourself ]! !
-
-!ReceptiveAccount methodsFor: 'transactions' stamp: 'GJC 9/26/2017 23:37:07'!
-balance
-
-	^ transactions inject: 0 into: [ :net :transaction | transaction updateBalance: net ]! !
-
-!ReceptiveAccount methodsFor: 'transactions' stamp: 'GJC 9/26/2017 23:59:28'!
-investmentNet
-
-	^ transactions inject: 0 into: [ :net :transaction | transaction updateInvestmentNet: net ]! !
-
 !ReceptiveAccount methodsFor: 'transactions' stamp: 'HernanWilkinson 7/13/2011 18:37'!
 register: aTransaction
 
@@ -1033,10 +1080,10 @@ transactions
 
 	^ transactions copy! !
 
-!ReceptiveAccount methodsFor: 'transactions' stamp: 'GJC 9/26/2017 23:37:01'!
-transferNet
+!ReceptiveAccount methodsFor: 'transactions' stamp: 'GJC 9/28/2017 03:06:13'!
+valueFor: anAccountOperation
 
-	^ transactions inject: 0 into: [ :net :transaction | transaction updateTransferNet: net ]! !
+	^ anAccountOperation applyToReceptiveAccount: self! !
 
 
 !ReceptiveAccount methodsFor: 'testing' stamp: 'HernanWilkinson 7/13/2011 18:37'!
@@ -1051,11 +1098,244 @@ registers: aTtransaction
 	^ transactions includes: aTtransaction 
 ! !
 
+
+!classDefinition: #TransactionOperation category: #'PortfolioTreePrinter-Ejercicio'!
+Object subclass: #TransactionOperation
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PortfolioTreePrinter-Ejercicio'!
 
-!ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'GJC 9/27/2017 00:13:23'!
-investmentEarnings
-	
-	^ transactions inject: 0 into: [ :earnings :transaction | transaction updateInvestmentEarnings: earnings ]! !
+!TransactionOperation methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 01:09:39'!
+applyToCertificateOfDeposit: aCertificateOfDeposit
+
+	self subclassResponsibility ! !
+
+!TransactionOperation methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 01:08:16'!
+applyToDeposit: aDeposit
+
+	self subclassResponsibility ! !
+
+!TransactionOperation methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 01:08:26'!
+applyToIncomingTransfer: anIncomingTransfer
+
+	self subclassResponsibility ! !
+
+!TransactionOperation methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 01:08:39'!
+applyToOutgoingTransfer: anOutgoingTransfer
+
+	self subclassResponsibility ! !
+
+!TransactionOperation methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 01:08:50'!
+applyToWithdraw: aWithdraw
+
+	self subclassResponsibility ! !
+
+!TransactionOperation methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 02:07:48'!
+initializeWith: aValue
+
+	self subclassResponsibility ! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'TransactionOperation class' category: #'PortfolioTreePrinter-Ejercicio'!
+TransactionOperation class
+	instanceVariableNames: ''!
+
+!TransactionOperation class methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 02:07:29'!
+with: aValue
+
+	^self new initializeWith: aValue ! !
+
+
+!classDefinition: #UpdateAccountSummary category: #'PortfolioTreePrinter-Ejercicio'!
+TransactionOperation subclass: #UpdateAccountSummary
+	instanceVariableNames: 'lines'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PortfolioTreePrinter-Ejercicio'!
+
+!UpdateAccountSummary methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 01:40:30'!
+applyToCertificateOfDeposit: aCertificateOfDeposit
+
+	^ lines add: ('Plazo fijo por ', aCertificateOfDeposit value printString, ' durante ', aCertificateOfDeposit numberOfDays printString, ' dias a una tna de ', (aCertificateOfDeposit tna * 100) printString, '%') ; yourself.! !
+
+!UpdateAccountSummary methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 01:46:39'!
+applyToDeposit: aDeposit
+
+	^ lines add: ('Deposito por ', aDeposit value printString) ; yourself! !
+
+!UpdateAccountSummary methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 01:46:45'!
+applyToIncomingTransfer: anIncomingTransfer
+
+	^ lines add: ('Transferencia por ', anIncomingTransfer value printString) ; yourself! !
+
+!UpdateAccountSummary methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 01:46:18'!
+applyToOutgoingTransfer: anOutgoingTransfer
+
+	^ lines add: ('Transferencia por ', anOutgoingTransfer value negated printString) ; yourself! !
+
+!UpdateAccountSummary methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 01:46:52'!
+applyToWithdraw: aWithdraw
+
+	^ lines add: ('Extraccion por ', aWithdraw value printString) ; yourself! !
+
+!UpdateAccountSummary methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 01:33:47'!
+initializeWith: aCollection
+
+	lines  := aCollection! !
+
+
+!classDefinition: #UpdateBalance category: #'PortfolioTreePrinter-Ejercicio'!
+TransactionOperation subclass: #UpdateBalance
+	instanceVariableNames: 'currentBalance'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PortfolioTreePrinter-Ejercicio'!
+
+!UpdateBalance methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 01:09:58'!
+applyToCertificateOfDeposit: aCertificateOfDeposit
+
+	^ currentBalance  - aCertificateOfDeposit value! !
+
+!UpdateBalance methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 01:06:43'!
+applyToDeposit: aDeposit
+
+	^ currentBalance + aDeposit value! !
+
+!UpdateBalance methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 01:07:12'!
+applyToIncomingTransfer: anIncomingTransfer
+
+	^ currentBalance + anIncomingTransfer value! !
+
+!UpdateBalance methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 01:07:30'!
+applyToOutgoingTransfer: anOutgoingTransfer
+
+	^ currentBalance - anOutgoingTransfer value! !
+
+!UpdateBalance methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 01:07:51'!
+applyToWithdraw: aWithdraw
+
+	^ currentBalance - aWithdraw value! !
+
+!UpdateBalance methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 01:02:35'!
+initializeWith: aCurrentBalance
+
+	currentBalance  := aCurrentBalance ! !
+
+
+!classDefinition: #UpdateInvestmentEarnings category: #'PortfolioTreePrinter-Ejercicio'!
+TransactionOperation subclass: #UpdateInvestmentEarnings
+	instanceVariableNames: 'currentEarnings'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PortfolioTreePrinter-Ejercicio'!
+
+!UpdateInvestmentEarnings methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 01:50:49'!
+applyToCertificateOfDeposit: aCertificateOfDeposit
+
+	^ currentEarnings + (aCertificateOfDeposit value * (aCertificateOfDeposit tna / 360) * aCertificateOfDeposit numberOfDays)! !
+
+!UpdateInvestmentEarnings methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 01:51:35'!
+applyToDeposit: aDeposit
+
+	^ currentEarnings ! !
+
+!UpdateInvestmentEarnings methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 01:52:09'!
+applyToIncomingTransfer: anIncomingTransfer
+
+	^ currentEarnings ! !
+
+!UpdateInvestmentEarnings methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 01:52:23'!
+applyToOutgoingTransfer: anOutgoingTransfer
+
+	^ currentEarnings ! !
+
+!UpdateInvestmentEarnings methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 01:52:55'!
+applyToWithdraw: aWithdraw
+
+	^ currentEarnings ! !
+
+!UpdateInvestmentEarnings methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 01:53:26'!
+initializeWith: aCurrentEarnings
+
+	currentEarnings := aCurrentEarnings ! !
+
+
+!classDefinition: #UpdateInvestmentNet category: #'PortfolioTreePrinter-Ejercicio'!
+TransactionOperation subclass: #UpdateInvestmentNet
+	instanceVariableNames: 'currentNet'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PortfolioTreePrinter-Ejercicio'!
+
+!UpdateInvestmentNet methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 01:58:38'!
+applyToCertificateOfDeposit: aCertificateOfDeposit
+
+	^ currentNet + aCertificateOfDeposit value! !
+
+!UpdateInvestmentNet methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 01:57:15'!
+applyToDeposit: aDeposit
+
+	^ currentNet ! !
+
+!UpdateInvestmentNet methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 01:59:30'!
+applyToIncomingTransfer: anIncomingTransfer
+
+	^ currentNet ! !
+
+!UpdateInvestmentNet methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 01:59:50'!
+applyToOutgoingTransfer: anOutgoingTransfer
+
+	^ currentNet ! !
+
+!UpdateInvestmentNet methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 02:00:38'!
+applyToWithdraw: aWithdraw
+
+	^ currentNet ! !
+
+!UpdateInvestmentNet methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 01:56:26'!
+initializeWith: aCurrentInvestmentNet
+
+	currentNet  := aCurrentInvestmentNet ! !
+
+
+!classDefinition: #UpdateTransferNet category: #'PortfolioTreePrinter-Ejercicio'!
+TransactionOperation subclass: #UpdateTransferNet
+	instanceVariableNames: 'currentNet'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PortfolioTreePrinter-Ejercicio'!
+
+!UpdateTransferNet methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 01:58:58'!
+applyToCertificateOfDeposit: aCertificateOfDeposit
+
+	^ currentNet ! !
+
+!UpdateTransferNet methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 01:57:21'!
+applyToDeposit: aDeposit
+
+	^ currentNet ! !
+
+!UpdateTransferNet methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 01:59:41'!
+applyToIncomingTransfer: anIncomingTransfer
+
+	^ currentNet + anIncomingTransfer value! !
+
+!UpdateTransferNet methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 02:00:03'!
+applyToOutgoingTransfer: anOutgoingTransfer
+
+	^ currentNet - anOutgoingTransfer value! !
+
+!UpdateTransferNet methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 02:00:51'!
+applyToWithdraw: aWithdraw
+
+	^ currentNet ! !
+
+!UpdateTransferNet methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 01:56:40'!
+initializeWith: aCurrentTransferNet
+
+	currentNet  := aCurrentTransferNet ! !
 
 
 !classDefinition: #Transfer category: #'PortfolioTreePrinter-Ejercicio'!
@@ -1085,3 +1365,43 @@ Transfer class
 register: anAmount from: fromAccount to: toAccount 
 	
 	self new initializeWithAmount: anAmount from: fromAccount to: toAccount! !
+
+
+!classDefinition: #UpdatePortfolioTree category: #'PortfolioTreePrinter-Ejercicio'!
+Object subclass: #UpdatePortfolioTree
+	instanceVariableNames: 'lines indentLevel names'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PortfolioTreePrinter-Ejercicio'!
+
+!UpdatePortfolioTree methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 03:13:14'!
+applyToPortfolio: aPortfolio
+
+	| portfolioLine |
+	
+	portfolioLine  := (String new: indentLevel withAll: $ ), (names at: aPortfolio).
+	lines add: portfolioLine.
+	^ aPortfolio accounts inject: lines into: [ :lines :nextAccount | nextAccount valueFor: (UpdatePortfolioTree withLines: lines names: names indentLevel: indentLevel + 1) ]! !
+
+!UpdatePortfolioTree methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 03:13:30'!
+applyToReceptiveAccount: aReceptiveAccount
+
+	^ lines add: (String new: indentLevel withAll: $ ), (names at: aReceptiveAccount ) ; yourself! !
+
+!UpdatePortfolioTree methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 03:02:34'!
+initializeWithLines: aCollection names: aDictionary indentLevel: anInteger
+
+	lines := aCollection.
+	names := aDictionary.
+	indentLevel := anInteger ! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'UpdatePortfolioTree class' category: #'PortfolioTreePrinter-Ejercicio'!
+UpdatePortfolioTree class
+	instanceVariableNames: ''!
+
+!UpdatePortfolioTree class methodsFor: 'as yet unclassified' stamp: 'GJC 9/28/2017 03:02:56'!
+withLines: aCollection names: aDictionary indentLevel: anInteger
+
+	^ self new initializeWithLines: aCollection names: aDictionary indentLevel: anInteger ! !
