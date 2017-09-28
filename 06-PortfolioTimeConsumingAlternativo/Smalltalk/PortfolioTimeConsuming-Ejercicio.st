@@ -570,16 +570,18 @@ initializeFor: aReceptiveAccount
 	
 	account := aReceptiveAccount ! !
 
-!AccountSummaryWithAllInvestmentInformation methodsFor: 'as yet unclassified' stamp: 'HernanWilkinson 7/17/2011 23:58'!
+!AccountSummaryWithAllInvestmentInformation methodsFor: 'as yet unclassified' stamp: 'ST 9/28/2017 20:25:50'!
 lines 
 
-	| lines investmentEarnings |
+	| investmentEarnings par |
 	
 	investmentEarnings := InvestmentNetVisitor for: account.
-	lines := (AccountSummaryWithInvestmentEarnings for: account) lines.
-	lines add: 'Inversiones por ', investmentEarnings value printString.
 	
-	 ^ lines! !
+	par := Paralelizador with: [ (AccountSummaryWithInvestmentEarnings for: account) lines ]
+							    with: [ 'Inversiones por ', investmentEarnings value printString ]
+							    join: [ :res1 :res2 | res1 add: res2. res1 ].
+							
+	^ par value! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -605,16 +607,17 @@ initializeFor: aReceptiveAccount
 	
 	account := aReceptiveAccount ! !
 
-!AccountSummaryWithInvestmentEarnings methodsFor: 'as yet unclassified' stamp: 'HernanWilkinson 7/17/2011 23:53'!
+!AccountSummaryWithInvestmentEarnings methodsFor: 'as yet unclassified' stamp: 'ST 9/28/2017 20:22:44'!
 lines 
 
-	| lines investmentEarnings |
+	| investmentEarnings par |
 	
 	investmentEarnings := InvestmentEarningVisitor for: account.
-	lines := (AccountSummary for: account) lines.
-	lines add: 'Ganancias por ', investmentEarnings value printString.
 	
-	 ^ lines! !
+	par := Paralelizador with: [ (AccountSummary for: account) lines ]
+							    with: [ 'Ganancias por ', investmentEarnings value printString ]
+							    join: [ :res1 :res2 | res1 add: res2. res1].
+	^par value! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -1251,6 +1254,43 @@ InvestmentNetVisitor class
 for: aReceptiveAccount 
 	
 	^ self new initializeFor: aReceptiveAccount ! !
+
+
+!classDefinition: #Paralelizador category: #'PortfolioTimeConsuming-Ejercicio'!
+Object subclass: #Paralelizador
+	instanceVariableNames: 'value sourceAccount targetAccount forkedClosure currentThreadClosure joinClosure'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PortfolioTimeConsuming-Ejercicio'!
+
+!Paralelizador methodsFor: 'as yet unclassified' stamp: 'ST 9/28/2017 20:06:24'!
+initializeWith: aBlock1 with: aBlock2 join: aBlock3
+
+	forkedClosure := aBlock1.
+	currentThreadClosure := aBlock2.
+	joinClosure := aBlock3! !
+
+!Paralelizador methodsFor: 'as yet unclassified' stamp: 'ST 9/28/2017 20:18:45'!
+value
+
+	| res1 sem res2 |
+	sem := Semaphore new.
+	[ res1 := forkedClosure value.
+		sem signal. ] fork.
+	res2 := currentThreadClosure value.
+	sem wait.
+	^joinClosure value: res1 value: res2.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'Paralelizador class' category: #'PortfolioTimeConsuming-Ejercicio'!
+Paralelizador class
+	instanceVariableNames: ''!
+
+!Paralelizador class methodsFor: 'as yet unclassified' stamp: 'ST 9/28/2017 20:00:04'!
+with: aBlock1 with: aBlock2 join: aBlock3
+
+	^ self new initializeWith: aBlock1 with: aBlock2 join: aBlock3! !
 
 
 !classDefinition: #SummarizingAccount category: #'PortfolioTimeConsuming-Ejercicio'!
