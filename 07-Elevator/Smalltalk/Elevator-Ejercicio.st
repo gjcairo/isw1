@@ -928,10 +928,10 @@ closeDoorWhenWaitingForPeople
 
 	self stopWaitingForPeople ! !
 
-!ElevatorCabin methodsFor: 'as yet unclassified' stamp: 'ST 10/2/2017 21:37:43'!
+!ElevatorCabin methodsFor: 'as yet unclassified' stamp: 'ST 10/12/2017 00:18:03'!
 doorClosed
 
-	state := CabinStateMoving new."deberia estar aca?"
+	state := CabinStateMoving new.
 	door closed! !
 
 !ElevatorCabin methodsFor: 'as yet unclassified' stamp: 'GJC 10/10/2017 18:38:27'!
