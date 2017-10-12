@@ -459,10 +459,30 @@ closeWhenOpened
 !CabinDoor methodsFor: 'as yet unclassified' stamp: 'GJC 10/10/2017 19:14:16'!
 closeWhenOpening! !
 
-!CabinDoor methodsFor: 'as yet unclassified' stamp: 'ST 10/2/2017 21:04:54'!
+!CabinDoor methodsFor: 'as yet unclassified' stamp: 'GJC 10/12/2017 00:09:55'!
 closed
 
-	state := CabinDoorStateClosed new.! !
+	state closedDoor: self! !
+
+!CabinDoor methodsFor: 'as yet unclassified' stamp: 'GJC 10/12/2017 00:09:14'!
+closedWhenClosed
+
+	ElevatorEmergency signal: 'Sensor de puerta desincronizado'! !
+
+!CabinDoor methodsFor: 'as yet unclassified' stamp: 'GJC 10/12/2017 00:08:53'!
+closedWhenClosing
+
+	state := CabinDoorStateClosed new! !
+
+!CabinDoor methodsFor: 'as yet unclassified' stamp: 'GJC 10/12/2017 00:09:27'!
+closedWhenOpened
+
+	ElevatorEmergency signal: 'Sensor de puerta desincronizado'! !
+
+!CabinDoor methodsFor: 'as yet unclassified' stamp: 'GJC 10/12/2017 00:09:30'!
+closedWhenOpening
+
+	ElevatorEmergency signal: 'Sensor de puerta desincronizado'! !
 
 !CabinDoor methodsFor: 'as yet unclassified' stamp: 'ST 10/2/2017 20:56:56'!
 initialize
@@ -528,6 +548,11 @@ closeCabinDoor: aCabinDoor
 
 	self subclassResponsibility ! !
 
+!CabinDoorState methodsFor: 'as yet unclassified' stamp: 'GJC 10/12/2017 00:10:06'!
+closedDoor: aCabinDoor
+
+	self subclassResponsibility ! !
+
 !CabinDoorState methodsFor: 'as yet unclassified' stamp: 'ST 10/2/2017 18:32:32'!
 isClosed
 
@@ -565,6 +590,11 @@ CabinDoorState subclass: #CabinDoorStateClosed
 closeCabinDoor: aCabinDoor
 
 	aCabinDoor closeWhenClosed ! !
+
+!CabinDoorStateClosed methodsFor: 'as yet unclassified' stamp: 'GJC 10/12/2017 00:10:25'!
+closedDoor: aCabinDoor
+
+	aCabinDoor closedWhenClosed ! !
 
 !CabinDoorStateClosed methodsFor: 'as yet unclassified' stamp: 'ST 10/2/2017 18:34:31'!
 isClosed
@@ -604,6 +634,11 @@ closeCabinDoor: aCabinDoor
 
 	aCabinDoor closeWhenClosing! !
 
+!CabinDoorStateClosing methodsFor: 'as yet unclassified' stamp: 'GJC 10/12/2017 00:10:30'!
+closedDoor: aCabinDoor
+
+	aCabinDoor closedWhenClosing! !
+
 !CabinDoorStateClosing methodsFor: 'as yet unclassified' stamp: 'ST 10/2/2017 18:36:28'!
 isClosed
 
@@ -642,6 +677,11 @@ closeCabinDoor: aCabinDoor
 
 	aCabinDoor closeWhenOpened! !
 
+!CabinDoorStateOpened methodsFor: 'as yet unclassified' stamp: 'GJC 10/12/2017 00:10:37'!
+closedDoor: aCabinDoor
+
+	aCabinDoor closedWhenOpened! !
+
 !CabinDoorStateOpened methodsFor: 'as yet unclassified' stamp: 'ST 10/2/2017 18:37:06'!
 isClosed
 
@@ -679,6 +719,11 @@ CabinDoorState subclass: #CabinDoorStateOpening
 closeCabinDoor: aCabinDoor
 
 	aCabinDoor closeWhenOpening! !
+
+!CabinDoorStateOpening methodsFor: 'as yet unclassified' stamp: 'GJC 10/12/2017 00:10:43'!
+closedDoor: aCabinDoor
+
+	aCabinDoor closedWhenOpening! !
 
 !CabinDoorStateOpening methodsFor: 'as yet unclassified' stamp: 'ST 10/2/2017 18:37:39'!
 isClosed
@@ -1000,10 +1045,19 @@ Object subclass: #ElevatorController
 	poolDictionaries: ''
 	category: 'Elevator-Ejercicio'!
 
-!ElevatorController methodsFor: 'as yet unclassified' stamp: 'ST 10/2/2017 21:04:02'!
+!ElevatorController methodsFor: 'as yet unclassified' stamp: 'GJC 10/12/2017 00:04:47'!
 cabinDoorClosed
 	
-	state := ElevatorControllerStateWorking new.
+	state cabinDoorClosedForController: self! !
+
+!ElevatorController methodsFor: 'as yet unclassified' stamp: 'GJC 10/12/2017 00:04:28'!
+cabinDoorClosedWhenIdle
+	
+	ElevatorEmergency signal: 'Sensor de puerta desincronizado'! !
+
+!ElevatorController methodsFor: 'as yet unclassified' stamp: 'GJC 10/12/2017 00:04:09'!
+cabinDoorClosedWhenWorking
+	
 	cabin doorClosed! !
 
 !ElevatorController methodsFor: 'as yet unclassified' stamp: 'GJC 10/10/2017 20:08:32'!
@@ -1112,12 +1166,16 @@ isWorking
 
 	^ state isWorking ! !
 
-!ElevatorController methodsFor: 'as yet unclassified' stamp: 'GJC 10/10/2017 20:17:35'!
+!ElevatorController methodsFor: 'as yet unclassified' stamp: 'GJC 10/11/2017 23:58:19'!
 movingCabinOnFloor: aFloorNumber
-
+	
+	| targetFloor |
+	
+	targetFloor := (floorsToGo at: 1).
+	((targetFloor - cabinFloorNumber) abs < (targetFloor - aFloorNumber) abs) ifTrue: [ ElevatorEmergency signal: 'Sensor de cabina desincronizado' ].
 	((cabinFloorNumber - aFloorNumber) abs = 1) ifFalse: [ ElevatorEmergency signal: 'Sensor de cabina desincronizado' ].
 	cabinFloorNumber := aFloorNumber.
-	((floorsToGo at: 1) = aFloorNumber) ifTrue: [ cabin stop ]! !
+	(targetFloor = aFloorNumber) ifTrue: [ cabin stop ]! !
 
 !ElevatorController methodsFor: 'as yet unclassified' stamp: 'ST 10/2/2017 21:23:50'!
 openCabinDoor
@@ -1147,6 +1205,11 @@ Object subclass: #ElevatorControllerState
 	poolDictionaries: ''
 	category: 'Elevator-Ejercicio'!
 
+!ElevatorControllerState methodsFor: 'as yet unclassified' stamp: 'GJC 10/12/2017 00:05:03'!
+cabinDoorClosedForController: anElevatorController
+
+	self subclassResponsibility ! !
+
 !ElevatorControllerState methodsFor: 'as yet unclassified' stamp: 'GJC 10/10/2017 18:47:20'!
 closeCabinDoorFromElevatorController: anElevatorController
 
@@ -1175,6 +1238,11 @@ ElevatorControllerState subclass: #ElevatorControllerStateIdle
 	poolDictionaries: ''
 	category: 'Elevator-Ejercicio'!
 
+!ElevatorControllerStateIdle methodsFor: 'as yet unclassified' stamp: 'GJC 10/12/2017 00:05:26'!
+cabinDoorClosedForController: anElevatorController
+
+	anElevatorController cabinDoorClosedWhenIdle ! !
+
 !ElevatorControllerStateIdle methodsFor: 'as yet unclassified' stamp: 'GJC 10/10/2017 18:47:46'!
 closeCabinDoorFromElevatorController: anElevatorController
 
@@ -1202,6 +1270,11 @@ ElevatorControllerState subclass: #ElevatorControllerStateWorking
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Elevator-Ejercicio'!
+
+!ElevatorControllerStateWorking methodsFor: 'as yet unclassified' stamp: 'GJC 10/12/2017 00:05:37'!
+cabinDoorClosedForController: anElevatorController
+
+	anElevatorController cabinDoorClosedWhenWorking! !
 
 !ElevatorControllerStateWorking methodsFor: 'as yet unclassified' stamp: 'GJC 10/10/2017 18:48:23'!
 closeCabinDoorFromElevatorController: anElevatorController
