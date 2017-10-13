@@ -538,16 +538,17 @@ setUp
 
 !classDefinition: #Cabin category: #'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
 Object subclass: #Cabin
-	instanceVariableNames: 'elevator state door motor currentFloorNumber'
+	instanceVariableNames: 'elevator state door motor currentFloorNumber eventListener'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
 
-!Cabin methodsFor: 'initialization' stamp: 'HAW 10/4/2017 14:14:26'!
-initializeOf: anElevator
+!Cabin methodsFor: 'initialization' stamp: 'GJC 10/12/2017 21:03:05'!
+initializeOf: anElevator withListener: anEventListener
 
 	elevator := anElevator.
-	door := CabinDoor of: self.
+	eventListener := anEventListener.
+	door := CabinDoor of: self withListener: eventListener.
 	motor := Motor new.
 	currentFloorNumber := 0.
 	state := CabinStoppedState for: self
@@ -568,20 +569,23 @@ waitForPeople
 ! !
 
 
-!Cabin methodsFor: 'state change' stamp: 'HAW 10/4/2017 14:15:24'!
+!Cabin methodsFor: 'state change' stamp: 'GJC 10/12/2017 21:23:34'!
 makeMoving
 	
-	state := CabinMovingState for: self! !
+	state := CabinMovingState for: self.
+	eventListener listen: state! !
 
-!Cabin methodsFor: 'state change' stamp: 'HAW 10/4/2017 14:15:31'!
+!Cabin methodsFor: 'state change' stamp: 'GJC 10/12/2017 21:23:56'!
 makeStopped
 	
-	state := CabinStoppedState for: self! !
+	state := CabinStoppedState for: self.
+	eventListener listen: state! !
 
-!Cabin methodsFor: 'state change' stamp: 'HAW 10/4/2017 14:15:37'!
+!Cabin methodsFor: 'state change' stamp: 'GJC 10/12/2017 21:24:10'!
 makeWaitingForPeople
 	
-	state := CabinWaitingForPeopleState for: self! !
+	state := CabinWaitingForPeopleState for: self.
+	eventListener listen: state! !
 
 
 !Cabin methodsFor: 'sensor activation' stamp: 'HAW 10/3/2017 16:47:02'!
@@ -719,6 +723,11 @@ of: anElevator
 
 	^self new initializeOf: anElevator! !
 
+!Cabin class methodsFor: 'instance creation' stamp: 'GJC 10/12/2017 21:04:47'!
+of: anElevator withListener: anEventListener
+
+	^self new initializeOf: anElevator withListener: anEventListener ! !
+
 
 !Cabin class methodsFor: 'exceptions' stamp: 'HAW 10/3/2017 20:00:48'!
 sensorDesincronizedErrorMessage
@@ -728,15 +737,16 @@ sensorDesincronizedErrorMessage
 
 !classDefinition: #CabinDoor category: #'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
 Object subclass: #CabinDoor
-	instanceVariableNames: 'cabin state motor'
+	instanceVariableNames: 'cabin state motor eventListener'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
 
-!CabinDoor methodsFor: 'initialization' stamp: 'HAW 10/4/2017 14:14:32'!
-initializeOf: aCabin
+!CabinDoor methodsFor: 'initialization' stamp: 'GJC 10/12/2017 21:03:40'!
+initializeOf: aCabin withListener: anEventListener
 
 	cabin := aCabin.
+	eventListener := anEventListener.
 	motor := Motor new.
 	state :=CabinDoorOpenedState for: self! !
 
@@ -866,25 +876,29 @@ isMotorStopped
 	^motor isStopped! !
 
 
-!CabinDoor methodsFor: 'state change' stamp: 'HAW 10/4/2017 14:14:46'!
+!CabinDoor methodsFor: 'state change' stamp: 'GJC 10/12/2017 21:23:07'!
 makeClosed
 	
-	state := CabinDoorClosedState for: self! !
+	state := CabinDoorClosedState for: self.
+	eventListener listen: state.! !
 
-!CabinDoor methodsFor: 'state change' stamp: 'HAW 10/4/2017 14:14:54'!
+!CabinDoor methodsFor: 'state change' stamp: 'GJC 10/12/2017 21:24:29'!
 makeClosing
 	
-	state := CabinDoorClosingState for: self! !
+	state := CabinDoorClosingState for: self.
+	eventListener listen: state! !
 
-!CabinDoor methodsFor: 'state change' stamp: 'HAW 10/4/2017 14:15:02'!
+!CabinDoor methodsFor: 'state change' stamp: 'GJC 10/12/2017 21:24:39'!
 makeOpened
 	
-	state := CabinDoorOpenedState for: self! !
+	state := CabinDoorOpenedState for: self.
+	eventListener listen: state! !
 
-!CabinDoor methodsFor: 'state change' stamp: 'HAW 10/4/2017 14:15:09'!
+!CabinDoor methodsFor: 'state change' stamp: 'GJC 10/12/2017 21:24:44'!
 makeOpening
 	
-	state := CabinDoorOpeningState for: self! !
+	state := CabinDoorOpeningState for: self.
+	eventListener listen: state! !
 
 
 !CabinDoor methodsFor: 'exceptions' stamp: 'HAW 10/3/2017 20:08:30'!
@@ -907,6 +921,11 @@ CabinDoor class
 of: aCabin
 
 	^self new initializeOf: aCabin ! !
+
+!CabinDoor class methodsFor: 'instance creation' stamp: 'GJC 10/12/2017 21:05:19'!
+of: aCabin withListener: anEventListener
+
+	^self new initializeOf: aCabin withListener: anEventListener ! !
 
 
 !CabinDoor class methodsFor: 'exceptions' stamp: 'HAW 10/3/2017 20:08:48'!
@@ -1324,15 +1343,16 @@ accept: aVisitor
 
 !classDefinition: #Elevator category: #'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
 Object subclass: #Elevator
-	instanceVariableNames: 'cabin state floorsToGo'
+	instanceVariableNames: 'cabin state floorsToGo eventListener'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
 
-!Elevator methodsFor: 'initialization' stamp: 'HAW 10/3/2017 16:12:07'!
+!Elevator methodsFor: 'initialization' stamp: 'GJC 10/12/2017 21:01:53'!
 initialize
 
-	cabin := Cabin of: self.
+	eventListener := EventListener new.
+	cabin := Cabin of: self withListener: eventListener.
 	floorsToGo := SortedCollection new.
 	state := ElevatorIdleState for: self.
 	! !
@@ -1354,6 +1374,11 @@ goUpPushedFromFloor: aFloorNumber
 
 	^state goUpPushedFromFloor: aFloorNumber! !
 
+
+!Elevator methodsFor: 'actions - private' stamp: 'GJC 10/12/2017 21:31:18'!
+addEventSubscriber: aSubscriber
+
+	eventListener addSubscriber: aSubscriber ! !
 
 !Elevator methodsFor: 'actions - private' stamp: 'HAW 10/3/2017 16:10:27'!
 goUpPushedFromFloorWhenIdle: aFloorNumber
@@ -1422,14 +1447,15 @@ Object subclass: #ElevatorConsole
 	poolDictionaries: ''
 	category: 'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
 
-!ElevatorConsole methodsFor: 'initialization' stamp: 'HAW 10/4/2017 14:16:02'!
+!ElevatorConsole methodsFor: 'initialization' stamp: 'GJC 10/12/2017 21:32:30'!
 initializeOf: anElevator
 	
+	anElevator addEventSubscriber: self.
 	stream := WriteStream on: String new.
 ! !
 
 
-!ElevatorConsole methodsFor: 'accessing' stamp: 'HAW 10/4/2017 12:41:14'!
+!ElevatorConsole methodsFor: 'accessing' stamp: 'GJC 10/12/2017 19:25:07'!
 consoleReadStream
 	
 	^ ReadStream on: stream contents ! !
@@ -1587,9 +1613,10 @@ Object subclass: #ElevatorStatusView
 	poolDictionaries: ''
 	category: 'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
 
-!ElevatorStatusView methodsFor: 'initialization' stamp: 'HAW 10/4/2017 14:16:11'!
+!ElevatorStatusView methodsFor: 'initialization' stamp: 'GJC 10/12/2017 21:33:28'!
 initializeOf: anElevator
-! !
+
+	anElevator addEventSubscriber: self! !
 
 
 !ElevatorStatusView methodsFor: 'accessing' stamp: 'HAW 10/4/2017 12:41:24'!
@@ -1648,6 +1675,29 @@ ElevatorStatusView class
 of: anElevator
 
 	^ self new initializeOf: anElevator! !
+
+
+!classDefinition: #EventListener category: #'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
+Object subclass: #EventListener
+	instanceVariableNames: 'subscribers'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
+
+!EventListener methodsFor: 'as yet unclassified' stamp: 'GJC 10/12/2017 21:31:36'!
+addSubscriber: aSubscriber
+
+	subscribers add: aSubscriber ! !
+
+!EventListener methodsFor: 'as yet unclassified' stamp: 'GJC 10/12/2017 21:28:49'!
+initialize
+
+	subscribers := OrderedCollection new.! !
+
+!EventListener methodsFor: 'as yet unclassified' stamp: 'GJC 10/12/2017 21:28:24'!
+listen: aVisitee
+
+	subscribers do: [ :aVisitor | aVisitee accept: aVisitor ]! !
 
 
 !classDefinition: #Motor category: #'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
