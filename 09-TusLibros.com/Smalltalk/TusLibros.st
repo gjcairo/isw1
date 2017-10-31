@@ -15,7 +15,7 @@ test01AlCrearUnCarritoElCarritoEstaVacio
 	
 	self assert: aCarrito isEmpty.! !
 
-!CarritoTest methodsFor: 'as yet unclassified' stamp: 'GJC 10/30/2017 00:49:12'!
+!CarritoTest methodsFor: 'as yet unclassified' stamp: 'ST 10/30/2017 20:54:26'!
 test02AlAgregarItemAlCarritoElCarritoNoEstaVacio
 
 	| aCatalog aCarrito anItem |
@@ -27,7 +27,7 @@ test02AlAgregarItemAlCarritoElCarritoNoEstaVacio
 	
 	self deny: aCarrito isEmpty.
 	self assert: aCarrito numberOfProducts = 1.
-	self assert: (aCarrito items includes: anItem)! !
+	self assert: (aCarrito amountOf: anItem) = 1.! !
 
 !CarritoTest methodsFor: 'as yet unclassified' stamp: 'GJC 10/30/2017 00:49:22'!
 test03ElCarritoNoPermiteAgregarItemsInvalidos
@@ -78,6 +78,21 @@ test05ElCarritoGuardaLaCantidadCorrectaDeCadaItem
 	self assert: (aCarrito amountOf: anItem) = 10.
 	self assert: (aCarrito amountOf: anotherItem) = 1.! !
 
+!CarritoTest methodsFor: 'as yet unclassified' stamp: 'ST 10/30/2017 18:40:56'!
+test06AlAgregarConsecutivamenteUnMismoProductoElCarritoGuardaLaCantidadCorrectaDelItem
+
+	| aCatalog aCarrito anItem |
+	
+	anItem := 'yogurt'.
+	aCatalog := Dictionary newFromPairs: {anItem. 10.}.
+	aCarrito := Carrito for: aCatalog.
+	
+	aCarrito add: anItem amount: 10.
+	aCarrito add: anItem amount: 10.
+	
+	self assert: aCarrito numberOfProducts = 20.
+	self assert: (aCarrito amountOf: anItem) = 20.! !
+
 
 !classDefinition: #CashierTest category: #TusLibros!
 TestCase subclass: #CashierTest
@@ -86,81 +101,119 @@ TestCase subclass: #CashierTest
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!CashierTest methodsFor: 'as yet unclassified' stamp: 'GJC 10/30/2017 00:44:46'!
+!CashierTest methodsFor: 'as yet unclassified' stamp: 'ST 10/30/2017 21:43:48'!
 test01NoEsPosibleHacerCheckoutDeCarritoVacio
 
-	| aCatalog aCarrito aCashier aCreditCard |
+	| aCatalog aCarrito aCashier aCreditCard aSalesBook aMPSimulator |
 	
 	aCatalog := Dictionary new.
 	aCarrito := Carrito for: aCatalog.
-	aCashier := Cashier for: aCatalog.
-	aCreditCard := CreditCard expiration: (Month current next).
+	aMPSimulator := MerchantProcessorSimulator new.
+	aCashier := Cashier for: aCatalog with: aMPSimulator.
+	aCreditCard := CreditCard number: '0123456789101112' expiration: (Month current next).
+	aSalesBook := OrderedCollection new.
 	
 	self 
-		should: [ aCashier charge: aCreditCard for: aCarrito ] 
+		should: [ aCashier charge: aCreditCard for: aCarrito with: aSalesBook ] 
 		raise: Error - MessageNotUnderstood 
 		withExceptionDo: [ :anException |
-			self assert: anException messageText = aCashier emptyCartErrorMessage ]! !
+			self assert: anException messageText = aCashier emptyCartErrorMessage.
+			self assert: (aSalesBook size) = 0 ]! !
 
-!CashierTest methodsFor: 'as yet unclassified' stamp: 'GJC 10/30/2017 00:45:51'!
-test02CobroDeCarritoSolamenteConItemsUnitariosTieneTotalCorrecto
+!CashierTest methodsFor: 'as yet unclassified' stamp: 'ST 10/30/2017 21:44:15'!
+test02CobroDeCarritoSolamenteConUnItemTieneTotalCorrecto
 
-	| aCatalog aCarrito aCashier aCreditCard |
+	| aCatalog aCarrito aCashier aCreditCard aSalesBook aMPSimulator |
 	
-	aCatalog := Dictionary newFromPairs: {'yogurt'. 15. 'queso'. 30.}.
+	aCatalog := Dictionary newFromPairs: {'yogurt'. 15.}.
 	aCarrito := Carrito for: aCatalog.
 	aCarrito add: 'yogurt'.
-	aCarrito add: 'queso'.
-	aCashier := Cashier for: aCatalog.
-	aCreditCard := CreditCard expiration: (Month current next).
+	aMPSimulator := MerchantProcessorSimulator new.
+	aCashier := Cashier for: aCatalog with: aMPSimulator.
+	aCreditCard := CreditCard number: '0123456789101112' expiration: (Month current next).
+	aSalesBook := OrderedCollection new.
 	
-	self assert: (aCashier charge: aCreditCard for: aCarrito) = 45! !
+	self assert: (aCashier charge: aCreditCard for: aCarrito with: aSalesBook) = 15.
+	self assert: (aSalesBook size = 1).
+	self assert: aSalesBook first = 15! !
 
-!CashierTest methodsFor: 'as yet unclassified' stamp: 'GJC 10/30/2017 00:46:05'!
+!CashierTest methodsFor: 'as yet unclassified' stamp: 'ST 10/30/2017 21:44:32'!
 test03CobroDeCarritoConDistintasUnidadesDeCadaItemTieneTotalCorrecto
 
-	| aCatalog aCarrito aCashier aCreditCard |
+	| aCatalog aCarrito aCashier aCreditCard aSalesBook aMPSimulator |
 	
 	aCatalog := Dictionary newFromPairs: {'yogurt'. 15. 'queso'. 30.}.
 	aCarrito := Carrito for: aCatalog.
 	aCarrito add: 'yogurt' amount: 5.
 	aCarrito add: 'queso'.
-	aCashier := Cashier for: aCatalog.
-	aCreditCard := CreditCard expiration: (Month current next).
+	aMPSimulator := MerchantProcessorSimulator new.
+	aCashier := Cashier for: aCatalog with: aMPSimulator.
+	aCreditCard := CreditCard number: '0123456789101112' expiration: (Month current next).
+	aSalesBook := OrderedCollection new.
 	
-	self assert: (aCashier charge: aCreditCard for: aCarrito) = 105! !
+	self assert: (aCashier charge: aCreditCard for: aCarrito with: aSalesBook) = 105.
+	self assert: (aSalesBook size = 1).
+	self assert: aSalesBook first = 105! !
 
-!CashierTest methodsFor: 'as yet unclassified' stamp: 'GJC 10/30/2017 00:44:58'!
+!CashierTest methodsFor: 'as yet unclassified' stamp: 'ST 10/30/2017 21:44:43'!
 test04HacerCheckoutDeUnCarritoConItemsConUnaTarjetaVencidaHaceUnMesDebeFallar
 
-	| aCatalog aCarrito aCashier aCreditCard |
+	| aCatalog aCarrito aCashier aCreditCard aSalesBook aMPSimulator |
 	
 	aCatalog := Dictionary newFromPairs: {'yogurt'. 15. 'queso'. 30.}.
 	aCarrito := Carrito for: aCatalog.
 	aCarrito add: 'yogurt' amount: 5.
 	aCarrito add: 'queso'.
-	aCashier := Cashier for: aCatalog.
-	aCreditCard := CreditCard expiration: (Month current previous).
+	aMPSimulator := MerchantProcessorSimulator new.
+	aCashier := Cashier for: aCatalog with: aMPSimulator.
+	aCreditCard := CreditCard number: '0123456789101112' expiration: (Month current previous).
+	aSalesBook := OrderedCollection new.
 	
 	self 
-		should: [ aCashier charge: aCreditCard for: aCarrito ] 
+		should: [ aCashier charge: aCreditCard for: aCarrito with: aSalesBook ] 
 		raise: Error - MessageNotUnderstood 
 		withExceptionDo: [ :anException |
-			self assert: anException messageText = aCashier cardExpiredErrorMessage ]! !
+			self assert: anException messageText = aCashier cardExpiredErrorMessage.
+			self assert: aSalesBook size = 0 ]! !
 
-!CashierTest methodsFor: 'as yet unclassified' stamp: 'GJC 10/30/2017 00:47:17'!
+!CashierTest methodsFor: 'as yet unclassified' stamp: 'ST 10/30/2017 21:44:55'!
 test05HacerCheckoutDeUnCarritoConItemsConUnaTarjetaQueVenceEsteMesNoDebeFallar
 
-	| aCatalog aCarrito aCashier aCreditCard |
+	| aCatalog aCarrito aCashier aCreditCard aSalesBook aMPSimulator |
 	
 	aCatalog := Dictionary newFromPairs: {'yogurt'. 15. 'queso'. 30.}.
 	aCarrito := Carrito for: aCatalog.
 	aCarrito add: 'yogurt' amount: 5.
 	aCarrito add: 'queso'.
-	aCashier := Cashier for: aCatalog.
-	aCreditCard := CreditCard expiration: (Month current).
+	aMPSimulator := MerchantProcessorSimulator new.
+	aCashier := Cashier for: aCatalog with: aMPSimulator.
+	aCreditCard := CreditCard number: '0123456789101112' expiration: (Month current).
+	aSalesBook := OrderedCollection new.
 	
-	self assert: (aCashier charge: aCreditCard for: aCarrito) = 105! !
+	self assert: (aCashier charge: aCreditCard for: aCarrito with: aSalesBook) = 105.
+	self assert: (aSalesBook size = 1).
+	self assert: aSalesBook first = 105! !
+
+!CashierTest methodsFor: 'as yet unclassified' stamp: 'ST 10/30/2017 21:28:34'!
+test06HacerCheckoutDeUnCarritoConItemsConUnaTarjetaRobadaDebeFallar
+
+	| aCatalog aCarrito aCashier aCreditCard aSalesBook aMPSimulator |
+	
+	aCatalog := Dictionary newFromPairs: {'yogurt'. 15}.
+	aCarrito := Carrito for: aCatalog.
+	aCarrito add: 'yogurt'.
+	aCreditCard := CreditCard number: '0123456789101112' expiration: (Month current).
+	aSalesBook := OrderedCollection new.
+	aMPSimulator := MerchantProcessorSimulator new.
+	aMPSimulator markAsInvalid: aCreditCard description: 'La tarjeta fue robada'.
+	aCashier := Cashier for: aCatalog with: aMPSimulator.
+	
+	self 
+		should: [ aCashier charge: aCreditCard for: aCarrito with: aSalesBook ] 
+		raise: Error - MessageNotUnderstood 
+		withExceptionDo: [ :anException |
+			self assert: anException messageText = 'La tarjeta fue robada'.
+			self assert: aSalesBook size = 0 ]! !
 
 
 !classDefinition: #Carrito category: #TusLibros!
@@ -175,13 +228,14 @@ add: anItem
 
 	self add: anItem amount: 1! !
 
-!Carrito methodsFor: 'as yet unclassified' stamp: 'GJC 10/29/2017 22:37:56'!
+!Carrito methodsFor: 'as yet unclassified' stamp: 'ST 10/30/2017 18:50:54'!
 add: anItem amount: anAmount
 
 	(catalog includes: anItem) ifFalse: [ self error: self invalidItemErrorMessage ].
 	(anAmount isInteger and: [ anAmount > 0 ]) ifFalse: [ self error: self invalidAmountErrorMessage ].
 	
-	items at: anItem put: anAmount ! !
+	items at: anItem ifAbsent: [ items at: anItem put: 0 ].
+	items at: anItem put: (items at: anItem) + anAmount! !
 
 !Carrito methodsFor: 'as yet unclassified' stamp: 'ST 10/26/2017 21:51:52'!
 amountOf: anItem
@@ -209,10 +263,10 @@ isEmpty
 
 	^ items isEmpty ! !
 
-!Carrito methodsFor: 'as yet unclassified' stamp: 'ST 10/26/2017 21:42:33'!
-items
+!Carrito methodsFor: 'as yet unclassified' stamp: 'ST 10/30/2017 20:55:57'!
+itemsDo: aBlock
 
-	^ items keys! !
+	^ items keysDo: aBlock! !
 
 !Carrito methodsFor: 'as yet unclassified' stamp: 'ST 10/26/2017 21:37:12'!
 numberOfProducts
@@ -233,7 +287,7 @@ for: aCatalog
 
 !classDefinition: #Cashier category: #TusLibros!
 Object subclass: #Cashier
-	instanceVariableNames: 'catalog'
+	instanceVariableNames: 'catalog merchantProcessor'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
@@ -243,28 +297,34 @@ cardExpiredErrorMessage
 
 	^ 'La tarjeta de credito esta vencida'! !
 
-!Cashier methodsFor: 'as yet unclassified' stamp: 'GJC 10/30/2017 00:31:59'!
-charge: aCreditCard for: aCarrito 
+!Cashier methodsFor: 'as yet unclassified' stamp: 'ST 10/30/2017 21:38:35'!
+charge: aCreditCard for: aCarrito with: aSalesBook
 	
-	(self isCreditCardExpired: aCreditCard) ifTrue: [ self error: self cardExpiredErrorMessage ].
+	| aPurchaseTotal |
+	
+	(aCreditCard isCardExpiredAt: Month current) ifTrue: [ self error: self cardExpiredErrorMessage ].
 	aCarrito isEmpty ifTrue: [ self error: self emptyCartErrorMessage ].
 	
-	^ aCarrito items inject: 0 into: [ :subtotal :nextItem | subtotal + ((aCarrito amountOf: nextItem) * (catalog at: nextItem)) ]! !
+	aPurchaseTotal := 0.
+	aCarrito itemsDo: [ :anItem | 
+		aPurchaseTotal := aPurchaseTotal + ((aCarrito amountOf: anItem) * (catalog at: anItem)) ].
+	
+	merchantProcessor charge: aCreditCard for: aPurchaseTotal.
+	
+	aSalesBook add: aPurchaseTotal.
+	
+	^ aPurchaseTotal ! !
 
 !Cashier methodsFor: 'as yet unclassified' stamp: 'GJC 10/29/2017 22:24:28'!
 emptyCartErrorMessage
 
 	^ 'No puede hacerse checkout de un carrito vacío'! !
 
-!Cashier methodsFor: 'as yet unclassified' stamp: 'GJC 10/29/2017 23:00:55'!
-initializeWith: aCatalog
+!Cashier methodsFor: 'as yet unclassified' stamp: 'ST 10/30/2017 21:36:42'!
+initializeWith: aCatalog with: aMerchantProcessor
 
-	catalog := aCatalog! !
-
-!Cashier methodsFor: 'as yet unclassified' stamp: 'GJC 10/30/2017 00:41:20'!
-isCreditCardExpired: aCreditCard
-	
-	^ aCreditCard expirationDate end < Month current start! !
+	catalog := aCatalog.
+	merchantProcessor := aMerchantProcessor ! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -272,30 +332,36 @@ isCreditCardExpired: aCreditCard
 Cashier class
 	instanceVariableNames: ''!
 
-!Cashier class methodsFor: 'as yet unclassified' stamp: 'GJC 10/29/2017 23:00:42'!
-for: aCatalog
+!Cashier class methodsFor: 'as yet unclassified' stamp: 'ST 10/30/2017 21:36:16'!
+for: aCatalog with: aMerchantProcessor
 
-	^ self new initializeWith: aCatalog! !
+	^ self new initializeWith: aCatalog with: aMerchantProcessor ! !
 
 
 !classDefinition: #CreditCard category: #TusLibros!
 Object subclass: #CreditCard
-	instanceVariableNames: 'expirationDate'
+	instanceVariableNames: 'expirationDate number'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!CreditCard methodsFor: 'as yet unclassified' stamp: 'GJC 10/30/2017 00:32:57'!
-expirationDate
-
-	^ expirationDate copy! !
-
-!CreditCard methodsFor: 'as yet unclassified' stamp: 'GJC 10/30/2017 00:42:48'!
-initializeWithExpiration: aMonth
-
+!CreditCard methodsFor: 'as yet unclassified' stamp: 'ST 10/30/2017 21:37:04'!
+initializeWith: aCreditCardNumber with: aMonth
+	
+	number := aCreditCardNumber.
 	expirationDate := aMonth
 	
 	! !
+
+!CreditCard methodsFor: 'as yet unclassified' stamp: 'ST 10/30/2017 20:41:23'!
+isCardExpiredAt: aMonth
+
+	^ expirationDate end < aMonth start! !
+
+!CreditCard methodsFor: 'as yet unclassified' stamp: 'ST 10/30/2017 21:35:43'!
+number
+
+	^ number copy! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -303,9 +369,40 @@ initializeWithExpiration: aMonth
 CreditCard class
 	instanceVariableNames: ''!
 
-!CreditCard class methodsFor: 'as yet unclassified' stamp: 'GJC 10/30/2017 00:41:40'!
-expiration: aMonth
+!CreditCard class methodsFor: 'as yet unclassified' stamp: 'ST 10/30/2017 21:37:24'!
+number: aCreditCardNumber expiration: aMonth
 
-	^ self new initializeWithExpiration: aMonth
+	^ self new initializeWith: aCreditCardNumber with: aMonth
 	
 	! !
+
+
+!classDefinition: #MerchantProcessorSimulator category: #TusLibros!
+Object subclass: #MerchantProcessorSimulator
+	instanceVariableNames: 'invalidCards'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+!MerchantProcessorSimulator methodsFor: 'as yet unclassified' stamp: 'ST 10/30/2017 21:41:03'!
+charge: aCreditCard for: anAmount
+
+	invalidCards at: (aCreditCard number) ifPresent: [ :desc | self error: desc ].! !
+
+!MerchantProcessorSimulator methodsFor: 'as yet unclassified' stamp: 'ST 10/30/2017 21:41:51'!
+initialize
+
+	invalidCards := Dictionary new! !
+
+!MerchantProcessorSimulator methodsFor: 'as yet unclassified' stamp: 'ST 10/30/2017 21:39:14'!
+markAsInvalid: aCreditCard description: aString 
+	
+	invalidCards at: (aCreditCard number) put: aString! !
+
+
+!classDefinition: #StoreTestObjectsFactory category: #TusLibros!
+Object subclass: #StoreTestObjectsFactory
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
