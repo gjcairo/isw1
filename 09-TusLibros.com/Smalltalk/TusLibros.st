@@ -101,7 +101,7 @@ TestCase subclass: #CashierTest
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!CashierTest methodsFor: 'as yet unclassified' stamp: 'ST 10/30/2017 21:43:48'!
+!CashierTest methodsFor: 'as yet unclassified' stamp: 'GJC 10/31/2017 14:09:57'!
 test01NoEsPosibleHacerCheckoutDeCarritoVacio
 
 	| aCatalog aCarrito aCashier aCreditCard aSalesBook aMPSimulator |
@@ -118,9 +118,10 @@ test01NoEsPosibleHacerCheckoutDeCarritoVacio
 		raise: Error - MessageNotUnderstood 
 		withExceptionDo: [ :anException |
 			self assert: anException messageText = aCashier emptyCartErrorMessage.
-			self assert: (aSalesBook size) = 0 ]! !
+			self assert: (aSalesBook size) = 0.
+			self deny: aMPSimulator processedPayment ]! !
 
-!CashierTest methodsFor: 'as yet unclassified' stamp: 'ST 10/30/2017 21:44:15'!
+!CashierTest methodsFor: 'as yet unclassified' stamp: 'GJC 10/31/2017 14:11:29'!
 test02CobroDeCarritoSolamenteConUnItemTieneTotalCorrecto
 
 	| aCatalog aCarrito aCashier aCreditCard aSalesBook aMPSimulator |
@@ -133,11 +134,13 @@ test02CobroDeCarritoSolamenteConUnItemTieneTotalCorrecto
 	aCreditCard := CreditCard number: '0123456789101112' expiration: (Month current next).
 	aSalesBook := OrderedCollection new.
 	
+	self deny: aMPSimulator processedPayment.
 	self assert: (aCashier charge: aCreditCard for: aCarrito with: aSalesBook) = 15.
+	self assert: aMPSimulator processedPayment.
 	self assert: (aSalesBook size = 1).
 	self assert: aSalesBook first = 15! !
 
-!CashierTest methodsFor: 'as yet unclassified' stamp: 'ST 10/30/2017 21:44:32'!
+!CashierTest methodsFor: 'as yet unclassified' stamp: 'GJC 10/31/2017 14:11:41'!
 test03CobroDeCarritoConDistintasUnidadesDeCadaItemTieneTotalCorrecto
 
 	| aCatalog aCarrito aCashier aCreditCard aSalesBook aMPSimulator |
@@ -151,11 +154,13 @@ test03CobroDeCarritoConDistintasUnidadesDeCadaItemTieneTotalCorrecto
 	aCreditCard := CreditCard number: '0123456789101112' expiration: (Month current next).
 	aSalesBook := OrderedCollection new.
 	
+	self deny: aMPSimulator processedPayment.
 	self assert: (aCashier charge: aCreditCard for: aCarrito with: aSalesBook) = 105.
+	self assert: aMPSimulator processedPayment.
 	self assert: (aSalesBook size = 1).
 	self assert: aSalesBook first = 105! !
 
-!CashierTest methodsFor: 'as yet unclassified' stamp: 'ST 10/30/2017 21:44:43'!
+!CashierTest methodsFor: 'as yet unclassified' stamp: 'GJC 10/31/2017 14:11:51'!
 test04HacerCheckoutDeUnCarritoConItemsConUnaTarjetaVencidaHaceUnMesDebeFallar
 
 	| aCatalog aCarrito aCashier aCreditCard aSalesBook aMPSimulator |
@@ -174,9 +179,10 @@ test04HacerCheckoutDeUnCarritoConItemsConUnaTarjetaVencidaHaceUnMesDebeFallar
 		raise: Error - MessageNotUnderstood 
 		withExceptionDo: [ :anException |
 			self assert: anException messageText = aCashier cardExpiredErrorMessage.
-			self assert: aSalesBook size = 0 ]! !
+			self assert: aSalesBook size = 0.
+			self deny: aMPSimulator processedPayment ]! !
 
-!CashierTest methodsFor: 'as yet unclassified' stamp: 'ST 10/30/2017 21:44:55'!
+!CashierTest methodsFor: 'as yet unclassified' stamp: 'GJC 10/31/2017 14:12:05'!
 test05HacerCheckoutDeUnCarritoConItemsConUnaTarjetaQueVenceEsteMesNoDebeFallar
 
 	| aCatalog aCarrito aCashier aCreditCard aSalesBook aMPSimulator |
@@ -190,11 +196,13 @@ test05HacerCheckoutDeUnCarritoConItemsConUnaTarjetaQueVenceEsteMesNoDebeFallar
 	aCreditCard := CreditCard number: '0123456789101112' expiration: (Month current).
 	aSalesBook := OrderedCollection new.
 	
+	self deny: aMPSimulator processedPayment.
 	self assert: (aCashier charge: aCreditCard for: aCarrito with: aSalesBook) = 105.
+	self assert: aMPSimulator processedPayment.
 	self assert: (aSalesBook size = 1).
 	self assert: aSalesBook first = 105! !
 
-!CashierTest methodsFor: 'as yet unclassified' stamp: 'ST 10/30/2017 21:28:34'!
+!CashierTest methodsFor: 'as yet unclassified' stamp: 'GJC 10/31/2017 14:12:13'!
 test06HacerCheckoutDeUnCarritoConItemsConUnaTarjetaRobadaDebeFallar
 
 	| aCatalog aCarrito aCashier aCreditCard aSalesBook aMPSimulator |
@@ -213,7 +221,30 @@ test06HacerCheckoutDeUnCarritoConItemsConUnaTarjetaRobadaDebeFallar
 		raise: Error - MessageNotUnderstood 
 		withExceptionDo: [ :anException |
 			self assert: anException messageText = 'La tarjeta fue robada'.
-			self assert: aSalesBook size = 0 ]! !
+			self assert: aSalesBook size = 0.
+			self deny: aMPSimulator processedPayment ]! !
+
+!CashierTest methodsFor: 'as yet unclassified' stamp: 'GJC 10/31/2017 14:12:21'!
+test07HacerCheckoutDeUnCarritoConItemsConUnaTarjetaSinSaldoDebeFallar
+
+	| aCatalog aCarrito aCashier aCreditCard aSalesBook aMPSimulator |
+	
+	aCatalog := Dictionary newFromPairs: {'yogurt'. 15}.
+	aCarrito := Carrito for: aCatalog.
+	aCarrito add: 'yogurt'.
+	aCreditCard := CreditCard number: '0123456789101112' expiration: (Month current).
+	aSalesBook := OrderedCollection new.
+	aMPSimulator := MerchantProcessorSimulator new.
+	aMPSimulator markAsInvalid: aCreditCard description: 'La tarjeta no tiene saldo suficiente'.
+	aCashier := Cashier for: aCatalog with: aMPSimulator.
+	
+	self 
+		should: [ aCashier charge: aCreditCard for: aCarrito with: aSalesBook ] 
+		raise: Error - MessageNotUnderstood 
+		withExceptionDo: [ :anException |
+			self assert: anException messageText = 'La tarjeta no tiene saldo suficiente'.
+			self assert: aSalesBook size = 0.
+			self deny: aMPSimulator processedPayment ]! !
 
 
 !classDefinition: #Carrito category: #TusLibros!
@@ -379,25 +410,37 @@ number: aCreditCardNumber expiration: aMonth
 
 !classDefinition: #MerchantProcessorSimulator category: #TusLibros!
 Object subclass: #MerchantProcessorSimulator
-	instanceVariableNames: 'invalidCards'
+	instanceVariableNames: 'invalidCards processedPayment'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!MerchantProcessorSimulator methodsFor: 'as yet unclassified' stamp: 'ST 10/30/2017 21:41:03'!
+!MerchantProcessorSimulator methodsFor: 'as yet unclassified' stamp: 'GJC 10/31/2017 14:01:33'!
 charge: aCreditCard for: anAmount
 
-	invalidCards at: (aCreditCard number) ifPresent: [ :desc | self error: desc ].! !
+	invalidCards at: (aCreditCard number) ifPresent: [ :desc | self error: desc ].
+	self processPayment: aCreditCard for: anAmount.! !
 
-!MerchantProcessorSimulator methodsFor: 'as yet unclassified' stamp: 'ST 10/30/2017 21:41:51'!
+!MerchantProcessorSimulator methodsFor: 'as yet unclassified' stamp: 'GJC 10/31/2017 14:02:20'!
 initialize
 
-	invalidCards := Dictionary new! !
+	invalidCards := Dictionary new.
+	processedPayment := false! !
 
 !MerchantProcessorSimulator methodsFor: 'as yet unclassified' stamp: 'ST 10/30/2017 21:39:14'!
 markAsInvalid: aCreditCard description: aString 
 	
 	invalidCards at: (aCreditCard number) put: aString! !
+
+!MerchantProcessorSimulator methodsFor: 'as yet unclassified' stamp: 'GJC 10/31/2017 14:02:07'!
+processPayment: aCreditCard for: anAmount
+
+	processedPayment := true! !
+
+!MerchantProcessorSimulator methodsFor: 'as yet unclassified' stamp: 'GJC 10/31/2017 14:03:03'!
+processedPayment
+
+	^ processedPayment ! !
 
 
 !classDefinition: #StoreTestObjectsFactory category: #TusLibros!
