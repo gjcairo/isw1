@@ -319,8 +319,28 @@ test04AgregarItemACarritoInvalidoFalla
 		withExceptionDo: [ :anException |
 			self assert: anException messageText = anInterface invalidCartErrorMessage ].! !
 
-!InterfaceTest methodsFor: 'as yet unclassified' stamp: 'ST 11/2/2017 21:28:35'!
+!InterfaceTest methodsFor: 'as yet unclassified' stamp: 'GJC 11/4/2017 19:02:56'!
 test05AgregarItemACarritoValidoActualizaLosItemsDelCarrito
+
+	| aClientId anInterface anAuthenticationService aClientIdPassword aBookISBN aBookPrice cartId aBookQuantity cartList |
+	
+	aClientId := '1234'.
+	aClientIdPassword := 'pass'.
+	anAuthenticationService := Dictionary newFromPairs: {aClientId. aClientIdPassword.}.
+	aBookISBN := '12345'.
+	aBookPrice := 15.
+	aBookQuantity := 10.
+	anInterface := Interface newWith: anAuthenticationService with: (Dictionary newFromPairs: {aBookISBN. aBookPrice.}).
+	
+	cartId := anInterface createCartFor: aClientId with: aClientIdPassword.
+	anInterface add: aBookISBN quantity: aBookQuantity to: cartId.
+	cartList := anInterface listCart: cartId.
+	
+	self assert: (cartList size) = 1.
+	self assert: (cartList at: aBookISBN) = aBookQuantity! !
+
+!InterfaceTest methodsFor: 'as yet unclassified' stamp: 'GJC 11/4/2017 19:22:01'!
+test06ListCartDeCarritoInvalidoFalla
 
 	| aClientId anInterface anAuthenticationService aClientIdPassword aBookISBN aBookPrice |
 	
@@ -332,10 +352,48 @@ test05AgregarItemACarritoValidoActualizaLosItemsDelCarrito
 	anInterface := Interface newWith: anAuthenticationService with: (Dictionary newFromPairs: {aBookISBN. aBookPrice.}).
 	
 	self
-		should: [ anInterface add: aBookISBN quantity: 10 to: 123 ]
+		should: [ anInterface listCart: 123 ]
 		raise: Error - MessageNotUnderstood 
 		withExceptionDo: [ :anException |
-			self assert: anException messageText = anInterface invalidCartErrorMessage ].! !
+			self assert: (anException messageText) = anInterface invalidCartErrorMessage ]! !
+
+!InterfaceTest methodsFor: 'as yet unclassified' stamp: 'GJC 11/4/2017 19:16:28'!
+test07CheckoutDeCarritoInvalidoFalla
+
+	| aClientId anInterface anAuthenticationService aClientIdPassword aBookISBN aBookPrice |
+	
+	aClientId := '1234'.
+	aClientIdPassword := 'pass'.
+	anAuthenticationService := Dictionary newFromPairs: {aClientId. aClientIdPassword.}.
+	aBookISBN := '12345'.
+	aBookPrice := 15.
+	anInterface := Interface newWith: anAuthenticationService with: (Dictionary newFromPairs: {aBookISBN. aBookPrice.}).
+	
+	self
+		should: [ anInterface checkOut: 123 ]
+		raise: Error - MessageNotUnderstood 
+		withExceptionDo: [ :anException |
+			self assert: anException messageText = anInterface invalidCartErrorMessage.
+			]! !
+
+!InterfaceTest methodsFor: 'as yet unclassified' stamp: 'GJC 11/4/2017 19:33:23'!
+test08CheckoutDeCarritoValidoDevuelveUnTransactionID
+
+	| aClientId anInterface anAuthenticationService aClientIdPassword aBookISBN aBookPrice |
+	
+	aClientId := '1234'.
+	aClientIdPassword := 'pass'.
+	anAuthenticationService := Dictionary newFromPairs: {aClientId. aClientIdPassword.}.
+	aBookISBN := '12345'.
+	aBookPrice := 15.
+	anInterface := Interface newWith: anAuthenticationService with: (Dictionary newFromPairs: {aBookISBN. aBookPrice.}).
+	
+	self
+		should: [ anInterface checkOut: 123 ]
+		raise: Error - MessageNotUnderstood 
+		withExceptionDo: [ :anException |
+			self assert: anException messageText = anInterface invalidCartErrorMessage.
+			]! !
 
 
 !classDefinition: #Carrito category: #TusLibros!
@@ -384,6 +442,11 @@ invalidItemErrorMessage
 isEmpty
 
 	^ items isEmpty ! !
+
+!Carrito methodsFor: 'as yet unclassified' stamp: 'GJC 11/4/2017 18:55:34'!
+itemsAndQuantities
+
+	^ items copy! !
 
 !Carrito methodsFor: 'as yet unclassified' stamp: 'ST 10/30/2017 20:55:57'!
 itemsDo: aBlock
@@ -506,12 +569,19 @@ Object subclass: #Interface
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!Interface methodsFor: 'as yet unclassified' stamp: 'ST 11/2/2017 21:07:00'!
+!Interface methodsFor: 'as yet unclassified' stamp: 'GJC 11/4/2017 18:57:53'!
 add: aBookISBN quantity: anInteger to: aCartId
 
-	carts at: aCartId ifAbsent: [ self error: self invalidCartErrorMessage ]. 
+	| cart |
+	cart := carts at: aCartId ifAbsent: [ self error: self invalidCartErrorMessage ].
 	
-	! !
+	cart add: aBookISBN amount: anInteger! !
+
+!Interface methodsFor: 'as yet unclassified' stamp: 'GJC 11/4/2017 19:22:49'!
+checkOut: aCartId
+
+	| cart |
+	cart := carts at: aCartId ifAbsent: [ self error: self invalidCartErrorMessage ]! !
 
 !Interface methodsFor: 'as yet unclassified' stamp: 'ST 11/2/2017 20:44:30'!
 createCartFor: aClientId with: aClientIdPassword
@@ -549,10 +619,10 @@ invalidClientIdErrorMessage
 	
 	^ 'El ID de cliente no existe'! !
 
-!Interface methodsFor: 'as yet unclassified' stamp: 'ST 11/2/2017 20:59:55'!
+!Interface methodsFor: 'as yet unclassified' stamp: 'GJC 11/4/2017 19:20:57'!
 listCart: aCartId 
 	
-	^ (carts at: aCartId) ! !
+	^ (carts at: aCartId ifAbsent: [ self error: self invalidCartErrorMessage ]) itemsAndQuantities! !
 
 !Interface methodsFor: 'as yet unclassified' stamp: 'ST 11/2/2017 20:06:27'!
 wrongPasswordErrorMessage
