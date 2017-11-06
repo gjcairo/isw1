@@ -409,6 +409,81 @@ test08CheckoutDeCarritoValidoProcesaMontoCorrecto
 	self assert: actualChargedAmount = aTotal.
 	self deny: transactionId = nil! !
 
+!InterfaceTest methodsFor: 'as yet unclassified' stamp: 'GJC 11/5/2017 20:32:47'!
+test09ListPurchasesDeClienteInvalidoFalla
+
+	| aClientId anInterface anAuthenticationService aClientIdPassword aBookISBN aBookPrice aCashier aCatalog aWrongClientId |
+	
+	aClientId := '1234'.
+	aWrongClientId := '123'.
+	aClientIdPassword := 'pass'.
+	anAuthenticationService := Dictionary newFromPairs: {aClientId. aClientIdPassword.}.
+
+	aBookISBN := '12345'.
+	aBookPrice := 15.
+	aCatalog := (Dictionary newFromPairs: {aBookISBN. aBookPrice.}).
+	aCashier := Cashier for: aCatalog with: self.
+	anInterface := Interface newWith: anAuthenticationService with: aCatalog with: aCashier.
+	
+	self
+		should: [ anInterface listPurchasesOf: aWrongClientId with: aClientIdPassword ]
+		raise: Error - MessageNotUnderstood
+		withExceptionDo: [ :anException |
+			self assert: anException messageText = anInterface invalidClientIdErrorMessage ]! !
+
+!InterfaceTest methodsFor: 'as yet unclassified' stamp: 'GJC 11/5/2017 20:34:25'!
+test10ListPurchasesConPasswordInvalidaFalla
+
+	| aClientId anInterface anAuthenticationService aClientIdPassword aBookISBN aBookPrice aCashier aCatalog aWrongClientIdPassword |
+	
+	aClientId := '1234'.
+	aClientIdPassword := 'pass'.
+	aWrongClientIdPassword := 'wrongpass'.
+	anAuthenticationService := Dictionary newFromPairs: {aClientId. aClientIdPassword.}.
+
+	aBookISBN := '12345'.
+	aBookPrice := 15.
+	aCatalog := (Dictionary newFromPairs: {aBookISBN. aBookPrice.}).
+	aCashier := Cashier for: aCatalog with: self.
+	anInterface := Interface newWith: anAuthenticationService with: aCatalog with: aCashier.
+	
+	self
+		should: [ anInterface listPurchasesOf: aClientId with: aWrongClientIdPassword ]
+		raise: Error - MessageNotUnderstood
+		withExceptionDo: [ :anException |
+			self assert: anException messageText = anInterface wrongPasswordErrorMessage ]! !
+
+!InterfaceTest methodsFor: 'as yet unclassified' stamp: 'GJC 11/5/2017 20:46:07'!
+test11ListPurchasesListaLasComprasCorrectamente
+
+	| aClientId anInterface anAuthenticationService aClientIdPassword aBookISBN aBookPrice aBookQuantity cartId aCashier aCatalog aSalesHistory anotherBookISBN anotherBookPrice anotherBookQuantity |
+	
+	aClientId := '1234'.
+	aClientIdPassword := 'pass'.
+	anAuthenticationService := Dictionary newFromPairs: {aClientId. aClientIdPassword.}.
+
+	aBookISBN := '12345'.
+	aBookPrice := 15.
+	aBookQuantity := 10.
+	anotherBookISBN := '6789'.
+	anotherBookPrice := 50.
+	anotherBookQuantity := 5.
+	aCatalog := (Dictionary newFromPairs: {aBookISBN. aBookPrice. anotherBookISBN. anotherBookPrice.}).
+	merchantProcessorSimulator := [ :aCreditCard :anAmount | ].
+	aCashier := Cashier for: aCatalog with: self.
+	
+	anInterface := Interface newWith: anAuthenticationService with: aCatalog with: aCashier.
+	cartId := anInterface createCartFor: aClientId with: aClientIdPassword.
+	anInterface add: aBookISBN quantity: aBookQuantity to: cartId.
+	anInterface add: anotherBookISBN quantity: anotherBookQuantity to: cartId.	
+	anInterface checkOut: cartId with: '1234567890101112' with: (Month current) with: 'Pepe'.
+	
+	aSalesHistory := anInterface listPurchasesOf: aClientId with: aClientIdPassword.
+	
+	self assert: (aSalesHistory at: aBookISBN) = aBookQuantity.
+	self assert: (aSalesHistory at: anotherBookISBN) = anotherBookQuantity.
+	self assert: (aSalesHistory size) = 2! !
+
 
 !classDefinition: #Carrito category: #TusLibros!
 Object subclass: #Carrito
@@ -596,31 +671,35 @@ number: aCreditCardNumber expiration: aMonth ownerName: aName
 
 !classDefinition: #Interface category: #TusLibros!
 Object subclass: #Interface
-	instanceVariableNames: 'authenticationService carts cartCatalog cashier lastCartId lastTransactionId'
+	instanceVariableNames: 'authenticationService carts cartCatalog cashier lastCartId lastTransactionId salesBooks'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!Interface methodsFor: 'as yet unclassified' stamp: 'GJC 11/4/2017 18:57:53'!
+!Interface methodsFor: 'as yet unclassified' stamp: 'GJC 11/5/2017 21:00:35'!
 add: aBookISBN quantity: anInteger to: aCartId
 
-	| cart |
-	cart := carts at: aCartId ifAbsent: [ self error: self invalidCartErrorMessage ].
+	|  aCart aCartRegistry |
+	aCartRegistry := carts at: aCartId ifAbsent: [ self error: self invalidCartErrorMessage ].
+	aCart := aCartRegistry at: 1.
 	
-	cart add: aBookISBN amount: anInteger! !
+	aCart add: aBookISBN amount: anInteger! !
 
-!Interface methodsFor: 'as yet unclassified' stamp: 'GJC 11/5/2017 20:22:59'!
+!Interface methodsFor: 'as yet unclassified' stamp: 'GJC 11/5/2017 20:58:54'!
 checkOut: aCartId with: aCreditCardNumber with: anExpirationDate with: aCreditCardOwner
 
-	| cart aCreditCard |
-	cart := carts at: aCartId ifAbsent: [ self error: self invalidCartErrorMessage ].
+	| aCart aCreditCard aCartRegistry aClientId aSalesBook |
+	aCartRegistry := carts at: aCartId ifAbsent: [ self error: self invalidCartErrorMessage ].
+	aCart := aCartRegistry at: 1.
+	aClientId := aCartRegistry at: 2.
 	
 	aCreditCard := CreditCard number: aCreditCardNumber expiration: anExpirationDate ownerName: aCreditCardOwner.
-	cashier charge: aCreditCard for: cart with: (OrderedCollection new).
+	aSalesBook := salesBooks at: aClientId ifAbsentPut: [ OrderedCollection new ].
+	cashier charge: aCreditCard for: aCart with: aSalesBook.
 	
 	^ self createTransactionId! !
 
-!Interface methodsFor: 'as yet unclassified' stamp: 'ST 11/2/2017 20:44:30'!
+!Interface methodsFor: 'as yet unclassified' stamp: 'GJC 11/5/2017 20:59:47'!
 createCartFor: aClientId with: aClientIdPassword
 	
 	| password cartId |
@@ -629,7 +708,7 @@ createCartFor: aClientId with: aClientIdPassword
 	(password = aClientIdPassword) ifFalse: [ self error: self wrongPasswordErrorMessage ].
 	
 	cartId := self createCartId.
-	carts at: cartId put: (Carrito for: cartCatalog).
+	carts at: cartId put: {(Carrito for: cartCatalog). aClientId.}.
 	^ cartId! !
 
 !Interface methodsFor: 'as yet unclassified' stamp: 'GJC 11/5/2017 20:13:59'!
@@ -655,7 +734,7 @@ initializeWith: anAuthenticationService with: aCatalog
 	authenticationService := anAuthenticationService.
 	cartCatalog := aCatalog ! !
 
-!Interface methodsFor: 'as yet unclassified' stamp: 'GJC 11/5/2017 20:16:06'!
+!Interface methodsFor: 'as yet unclassified' stamp: 'GJC 11/5/2017 20:51:39'!
 initializeWith: anAuthenticationService with: aCatalog with: aCashier
 
 	lastCartId := 0.
@@ -663,7 +742,8 @@ initializeWith: anAuthenticationService with: aCatalog with: aCashier
 	carts := Dictionary new.
 	authenticationService := anAuthenticationService.
 	cartCatalog := aCatalog.
-	cashier := aCashier! !
+	cashier := aCashier.
+	salesBooks := Dictionary new! !
 
 !Interface methodsFor: 'as yet unclassified' stamp: 'ST 11/2/2017 21:07:22'!
 invalidCartErrorMessage
@@ -679,6 +759,16 @@ invalidClientIdErrorMessage
 listCart: aCartId 
 	
 	^ (carts at: aCartId ifAbsent: [ self error: self invalidCartErrorMessage ]) itemsAndQuantities! !
+
+!Interface methodsFor: 'as yet unclassified' stamp: 'GJC 11/5/2017 20:50:05'!
+listPurchasesOf: aClientId with: aClientIdPassword
+
+	| password |
+	
+	password := authenticationService at: aClientId ifAbsent: [ self error: self invalidClientIdErrorMessage ].
+	(password = aClientIdPassword) ifFalse: [ self error: self wrongPasswordErrorMessage ].
+	
+	^ salesBooks at: aClientId! !
 
 !Interface methodsFor: 'as yet unclassified' stamp: 'ST 11/2/2017 20:06:27'!
 wrongPasswordErrorMessage
