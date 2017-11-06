@@ -121,7 +121,7 @@ test01NoEsPosibleHacerCheckoutDeCarritoVacio
 			self assert: (aSalesBook size) = 0.
 			self deny: aMPSimulator processedPayment ]! !
 
-!CashierTest methodsFor: 'as yet unclassified' stamp: 'GJC 10/31/2017 14:11:29'!
+!CashierTest methodsFor: 'as yet unclassified' stamp: 'GJC 11/5/2017 21:58:37'!
 test02CobroDeCarritoSolamenteConUnItemTieneTotalCorrecto
 
 	| aCatalog aCarrito aCashier aCreditCard aSalesBook aMPSimulator |
@@ -132,15 +132,15 @@ test02CobroDeCarritoSolamenteConUnItemTieneTotalCorrecto
 	aMPSimulator := MerchantProcessorSimulator new.
 	aCashier := Cashier for: aCatalog with: aMPSimulator.
 	aCreditCard := CreditCard number: '0123456789101112' expiration: (Month current next).
-	aSalesBook := OrderedCollection new.
+	aSalesBook := Dictionary new.
 	
 	self deny: aMPSimulator processedPayment.
 	self assert: (aCashier charge: aCreditCard for: aCarrito with: aSalesBook) = 15.
 	self assert: aMPSimulator processedPayment.
 	self assert: (aSalesBook size = 1).
-	self assert: aSalesBook first = 15! !
+	self assert: (aSalesBook at: 'yogurt') = 1! !
 
-!CashierTest methodsFor: 'as yet unclassified' stamp: 'GJC 10/31/2017 14:11:41'!
+!CashierTest methodsFor: 'as yet unclassified' stamp: 'GJC 11/5/2017 22:00:00'!
 test03CobroDeCarritoConDistintasUnidadesDeCadaItemTieneTotalCorrecto
 
 	| aCatalog aCarrito aCashier aCreditCard aSalesBook aMPSimulator |
@@ -152,15 +152,16 @@ test03CobroDeCarritoConDistintasUnidadesDeCadaItemTieneTotalCorrecto
 	aMPSimulator := MerchantProcessorSimulator new.
 	aCashier := Cashier for: aCatalog with: aMPSimulator.
 	aCreditCard := CreditCard number: '0123456789101112' expiration: (Month current next).
-	aSalesBook := OrderedCollection new.
+	aSalesBook := Dictionary new.
 	
 	self deny: aMPSimulator processedPayment.
 	self assert: (aCashier charge: aCreditCard for: aCarrito with: aSalesBook) = 105.
 	self assert: aMPSimulator processedPayment.
-	self assert: (aSalesBook size = 1).
-	self assert: aSalesBook first = 105! !
+	self assert: (aSalesBook size = 2).
+	self assert: (aSalesBook at: 'yogurt') = 5.
+	self assert: (aSalesBook at: 'queso') = 1! !
 
-!CashierTest methodsFor: 'as yet unclassified' stamp: 'GJC 10/31/2017 14:11:51'!
+!CashierTest methodsFor: 'as yet unclassified' stamp: 'GJC 11/5/2017 22:00:13'!
 test04HacerCheckoutDeUnCarritoConItemsConUnaTarjetaVencidaHaceUnMesDebeFallar
 
 	| aCatalog aCarrito aCashier aCreditCard aSalesBook aMPSimulator |
@@ -172,7 +173,7 @@ test04HacerCheckoutDeUnCarritoConItemsConUnaTarjetaVencidaHaceUnMesDebeFallar
 	aMPSimulator := MerchantProcessorSimulator new.
 	aCashier := Cashier for: aCatalog with: aMPSimulator.
 	aCreditCard := CreditCard number: '0123456789101112' expiration: (Month current previous).
-	aSalesBook := OrderedCollection new.
+	aSalesBook := Dictionary new.
 	
 	self 
 		should: [ aCashier charge: aCreditCard for: aCarrito with: aSalesBook ] 
@@ -182,7 +183,7 @@ test04HacerCheckoutDeUnCarritoConItemsConUnaTarjetaVencidaHaceUnMesDebeFallar
 			self assert: aSalesBook size = 0.
 			self deny: aMPSimulator processedPayment ]! !
 
-!CashierTest methodsFor: 'as yet unclassified' stamp: 'GJC 10/31/2017 14:12:05'!
+!CashierTest methodsFor: 'as yet unclassified' stamp: 'GJC 11/5/2017 22:00:38'!
 test05HacerCheckoutDeUnCarritoConItemsConUnaTarjetaQueVenceEsteMesNoDebeFallar
 
 	| aCatalog aCarrito aCashier aCreditCard aSalesBook aMPSimulator |
@@ -194,15 +195,16 @@ test05HacerCheckoutDeUnCarritoConItemsConUnaTarjetaQueVenceEsteMesNoDebeFallar
 	aMPSimulator := MerchantProcessorSimulator new.
 	aCashier := Cashier for: aCatalog with: aMPSimulator.
 	aCreditCard := CreditCard number: '0123456789101112' expiration: (Month current).
-	aSalesBook := OrderedCollection new.
+	aSalesBook := Dictionary new.
 	
 	self deny: aMPSimulator processedPayment.
 	self assert: (aCashier charge: aCreditCard for: aCarrito with: aSalesBook) = 105.
 	self assert: aMPSimulator processedPayment.
-	self assert: (aSalesBook size = 1).
-	self assert: aSalesBook first = 105! !
+	self assert: (aSalesBook size = 2).
+	self assert: (aSalesBook at: 'yogurt') = 5.
+	self assert: (aSalesBook at: 'queso') = 1! !
 
-!CashierTest methodsFor: 'as yet unclassified' stamp: 'GJC 10/31/2017 14:12:13'!
+!CashierTest methodsFor: 'as yet unclassified' stamp: 'GJC 11/5/2017 22:00:51'!
 test06HacerCheckoutDeUnCarritoConItemsConUnaTarjetaRobadaDebeFallar
 
 	| aCatalog aCarrito aCashier aCreditCard aSalesBook aMPSimulator |
@@ -211,7 +213,7 @@ test06HacerCheckoutDeUnCarritoConItemsConUnaTarjetaRobadaDebeFallar
 	aCarrito := Carrito for: aCatalog.
 	aCarrito add: 'yogurt'.
 	aCreditCard := CreditCard number: '0123456789101112' expiration: (Month current).
-	aSalesBook := OrderedCollection new.
+	aSalesBook := Dictionary new.
 	aMPSimulator := MerchantProcessorSimulator new.
 	aMPSimulator markAsInvalid: aCreditCard description: 'La tarjeta fue robada'.
 	aCashier := Cashier for: aCatalog with: aMPSimulator.
@@ -224,7 +226,7 @@ test06HacerCheckoutDeUnCarritoConItemsConUnaTarjetaRobadaDebeFallar
 			self assert: aSalesBook size = 0.
 			self deny: aMPSimulator processedPayment ]! !
 
-!CashierTest methodsFor: 'as yet unclassified' stamp: 'GJC 10/31/2017 14:12:21'!
+!CashierTest methodsFor: 'as yet unclassified' stamp: 'GJC 11/5/2017 22:03:43'!
 test07HacerCheckoutDeUnCarritoConItemsConUnaTarjetaSinSaldoDebeFallar
 
 	| aCatalog aCarrito aCashier aCreditCard aSalesBook aMPSimulator |
@@ -233,7 +235,7 @@ test07HacerCheckoutDeUnCarritoConItemsConUnaTarjetaSinSaldoDebeFallar
 	aCarrito := Carrito for: aCatalog.
 	aCarrito add: 'yogurt'.
 	aCreditCard := CreditCard number: '0123456789101112' expiration: (Month current).
-	aSalesBook := OrderedCollection new.
+	aSalesBook := Dictionary new.
 	aMPSimulator := MerchantProcessorSimulator new.
 	aMPSimulator markAsInvalid: aCreditCard description: 'La tarjeta no tiene saldo suficiente'.
 	aCashier := Cashier for: aCatalog with: aMPSimulator.
@@ -362,7 +364,7 @@ test06ListCartDeCarritoInvalidoFalla
 		withExceptionDo: [ :anException |
 			self assert: (anException messageText) = anInterface invalidCartErrorMessage ]! !
 
-!InterfaceTest methodsFor: 'as yet unclassified' stamp: 'GJC 11/4/2017 19:16:28'!
+!InterfaceTest methodsFor: 'as yet unclassified' stamp: 'GJC 11/5/2017 22:05:14'!
 test07CheckoutDeCarritoInvalidoFalla
 
 	| aClientId anInterface anAuthenticationService aClientIdPassword aBookISBN aBookPrice |
@@ -375,7 +377,7 @@ test07CheckoutDeCarritoInvalidoFalla
 	anInterface := Interface newWith: anAuthenticationService with: (Dictionary newFromPairs: {aBookISBN. aBookPrice.}).
 	
 	self
-		should: [ anInterface checkOut: 123 ]
+		should: [ anInterface checkOut: 123 with: '1234567890101112' with: (Month current) with: 'Pepe' ]
 		raise: Error - MessageNotUnderstood 
 		withExceptionDo: [ :anException |
 			self assert: anException messageText = anInterface invalidCartErrorMessage.
@@ -571,21 +573,22 @@ cardExpiredErrorMessage
 
 	^ 'La tarjeta de credito esta vencida'! !
 
-!Cashier methodsFor: 'as yet unclassified' stamp: 'ST 10/30/2017 21:38:35'!
+!Cashier methodsFor: 'as yet unclassified' stamp: 'GJC 11/5/2017 22:03:22'!
 charge: aCreditCard for: aCarrito with: aSalesBook
 	
-	| aPurchaseTotal |
+	| aPurchaseTotal updatedSalesBook |
 	
 	(aCreditCard isCardExpiredAt: Month current) ifTrue: [ self error: self cardExpiredErrorMessage ].
 	aCarrito isEmpty ifTrue: [ self error: self emptyCartErrorMessage ].
 	
 	aPurchaseTotal := 0.
+	updatedSalesBook := Dictionary new.
 	aCarrito itemsDo: [ :anItem | 
-		aPurchaseTotal := aPurchaseTotal + ((aCarrito amountOf: anItem) * (catalog at: anItem)) ].
+		aPurchaseTotal := aPurchaseTotal + ((aCarrito amountOf: anItem) * (catalog at: anItem)).
+		updatedSalesBook at: anItem put: ((aSalesBook at: anItem ifAbsent: [ 0 ]) + (aCarrito amountOf: anItem)) ].
 	
 	merchantProcessor charge: aCreditCard for: aPurchaseTotal.
-	
-	aSalesBook add: aPurchaseTotal.
+	aSalesBook addAll: updatedSalesBook.
 	
 	^ aPurchaseTotal ! !
 
@@ -685,7 +688,7 @@ add: aBookISBN quantity: anInteger to: aCartId
 	
 	aCart add: aBookISBN amount: anInteger! !
 
-!Interface methodsFor: 'as yet unclassified' stamp: 'GJC 11/5/2017 20:58:54'!
+!Interface methodsFor: 'as yet unclassified' stamp: 'GJC 11/5/2017 21:56:02'!
 checkOut: aCartId with: aCreditCardNumber with: anExpirationDate with: aCreditCardOwner
 
 	| aCart aCreditCard aCartRegistry aClientId aSalesBook |
@@ -694,7 +697,7 @@ checkOut: aCartId with: aCreditCardNumber with: anExpirationDate with: aCreditCa
 	aClientId := aCartRegistry at: 2.
 	
 	aCreditCard := CreditCard number: aCreditCardNumber expiration: anExpirationDate ownerName: aCreditCardOwner.
-	aSalesBook := salesBooks at: aClientId ifAbsentPut: [ OrderedCollection new ].
+	aSalesBook := salesBooks at: aClientId ifAbsentPut: [ Dictionary new ].
 	cashier charge: aCreditCard for: aCart with: aSalesBook.
 	
 	^ self createTransactionId! !
@@ -755,10 +758,13 @@ invalidClientIdErrorMessage
 	
 	^ 'El ID de cliente no existe'! !
 
-!Interface methodsFor: 'as yet unclassified' stamp: 'GJC 11/4/2017 19:20:57'!
+!Interface methodsFor: 'as yet unclassified' stamp: 'GJC 11/5/2017 22:04:35'!
 listCart: aCartId 
 	
-	^ (carts at: aCartId ifAbsent: [ self error: self invalidCartErrorMessage ]) itemsAndQuantities! !
+	| aCart aCartRegistry |
+	aCartRegistry := (carts at: aCartId ifAbsent: [ self error: self invalidCartErrorMessage ]).
+	aCart := aCartRegistry at: 1.
+	^ aCart itemsAndQuantities! !
 
 !Interface methodsFor: 'as yet unclassified' stamp: 'GJC 11/5/2017 20:50:05'!
 listPurchasesOf: aClientId with: aClientIdPassword
